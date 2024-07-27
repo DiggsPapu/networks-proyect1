@@ -1,0 +1,17 @@
+services:
+  frontend:
+    image: redes-frontend
+    build:
+      context: ./Frontend
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: production
+    ports:
+      - 3030:3030
+    # Aqui se define como el volumen del container en el cual se guardaran los cambios
+    # En mi caso es de development asi que este me sirve
+    volumes:
+      - './Frontend:/app'
+      - '/app/node_modules'
+  
+  
