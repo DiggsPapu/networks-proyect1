@@ -12,6 +12,6 @@ services:
     # En mi caso es de development asi que este me sirve
     volumes:
       - './Frontend:/app'
-      - '/app/node_modules'
+      - './Frontend/node_modules:/app/node_modules'
   
   
