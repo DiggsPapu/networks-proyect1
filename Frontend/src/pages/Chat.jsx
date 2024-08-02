@@ -1,15 +1,15 @@
 import React, { Component, Fragment } from 'react'
 
-import ChatHead from './components/ChatHead'
-import Message from './components/Message'
-import ChatFooter from './components/ChatFooter'
+import ChatHead from '../components/ChatHead'
+import Message from '../components/Message'
+import ChatFooter from '../components/ChatFooter'
 
-import GlobalStyle from './GlobalStyle'
+import GlobalStyle from '../GlobalStyle'
 import styled from 'styled-components'
 
 const heightToggled = `
     height: 0%;
-    min-height: 0%;
+    min-height: 0%; 
     opacity: 0;
 `
 
@@ -101,7 +101,7 @@ function getQuote(numberMessages) {
   return messages;
 }
 
-class App extends Component {
+class Chat extends Component {
   state = {
     name: randomName(),
     messages: getQuote(),
@@ -147,4 +147,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default Chat;
