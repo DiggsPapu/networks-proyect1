@@ -1,11 +1,19 @@
 import React, { Component, Fragment } from 'react'
-
+import { useNavigate } from "react-router-dom"
 import ChatHead from '../components/ChatHead'
 import Message from '../components/Message'
 import ChatFooter from '../components/ChatFooter'
-
+import { logout } from '../services/auth-service'
 import GlobalStyle from '../GlobalStyle'
 import styled from 'styled-components'
+
+
+const withNavigate = (Component) => {
+  return (props) => {
+    const navigate = useNavigate();
+    return <Component {...props} navigate={navigate} />
+  }
+}
 
 const heightToggled = `
     height: 0%;
@@ -71,15 +79,6 @@ const container = ({toggle, children}) => (
     </ChatContainer>
 )
 
-
-function randomName() {
-  const adjectives = ["autumn", "hidden", "bitter", "misty", "silent", "empty", "dry", "dark", "summer", "icy", "delicate", "quiet", "white", "cool", "spring", "winter", "patient", "twilight", "dawn", "crimson", "wispy", "weathered", "blue", "billowing", "broken", "cold", "damp", "falling", "frosty", "green", "long", "late", "lingering", "bold", "little", "morning", "muddy", "old", "red", "rough", "still", "small", "sparkling", "throbbing", "shy", "wandering", "withered", "wild", "black", "young", "holy", "solitary", "fragrant", "aged", "snowy", "proud", "floral", "restless", "divine", "polished", "ancient", "purple", "lively", "nameless"];
-  const nouns = ["waterfall", "river", "breeze", "moon", "rain", "wind", "sea", "morning", "snow", "lake", "sunset", "pine", "shadow", "leaf", "dawn", "glitter", "forest", "hill", "cloud", "meadow", "sun", "glade", "bird", "brook", "butterfly", "bush", "dew", "dust", "field", "fire", "flower", "firefly", "feather", "grass", "haze", "mountain", "night", "pond", "darkness", "snowflake", "silence", "sound", "sky", "shape", "surf", "thunder", "violet", "water", "wildflower", "wave", "water", "resonance", "sun", "wood", "dream", "cherry", "tree", "fog", "frost", "voice", "paper", "frog", "smoke", "star"];
-  const adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
-  const noun = nouns[Math.floor(Math.random() * nouns.length)];
-  return `${adjective.toUpperCase()} ${noun.toUpperCase()}`;
-}
-
 function getQuote(numberMessages) {
   var nouns = ["car", "horse", "apple", "person", "chimp"];
   var adjectives = ["red", "fast", "lonely", "hungry", "insane"];
@@ -103,11 +102,10 @@ function getQuote(numberMessages) {
 
 class Chat extends Component {
   state = {
-    name: randomName(),
+    name: localStorage.getItem("username"),
     messages: getQuote(),
-    toggleChat: false
+    toggleChat: false,
   }
-
   onSubmitMessage = msg => {
     this.setState((prevState) => {
       const newMessage = {userId: 1, message:msg }
@@ -120,11 +118,18 @@ class Chat extends Component {
   handleToggle = () => {
     this.setState({toggleChat: !this.state.toggleChat})
   }
-
+  logout = async () => {
+    const success = await logout()
+    if (success) {
+      localStorage.clear()
+      this.props.navigate('/login')
+    }
+  }
   render() {
     return (
       <Fragment>
         <GlobalStyle />
+        <button type='submit' onClick={this.logout}>Log out</button>
         <Container>
           <ChatContainer
             toggle={this.state.toggleChat}
@@ -147,4 +152,4 @@ class Chat extends Component {
   }
 }
 
-export default Chat;
+export default withNavigate(Chat)
