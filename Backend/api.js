@@ -32,7 +32,7 @@ app.use((req, res, next) => {
 });
 
 app.listen(port, ()=>
-    console.log("App listening on port 6363")
+    console.log("App listening on port "+port)
     );
 
 module.exports = app;
