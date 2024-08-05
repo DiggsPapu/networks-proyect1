@@ -6,7 +6,7 @@ const cors = require('cors');
 var path = require('path');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
-
+var authRoutes = require('./routes/auth');
 // Create server
 const app = express();
 
@@ -34,5 +34,5 @@ app.use((req, res, next) => {
 app.listen(port, ()=>
     console.log("App listening on port "+port)
     );
-
+app.use(authRoutes);
 module.exports = app;
