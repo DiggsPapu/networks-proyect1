@@ -4,13 +4,17 @@ const router = express.Router();
 
 // Login route -- POST request
 router.post(
-    "/login",authController.Login
+    "/auth/login",authController.Login
 );
 // Register route -- POST request
 router.post(
-    "/register",  (req, res)=>{
+    "/auth/register",  (req, res)=>{
         res.status(200).send("hola")
     }
+);
+// Logout route -- GET request
+router.get(
+    "/auth/logout",  authController.Loggout
 );
 
 module.exports = router;

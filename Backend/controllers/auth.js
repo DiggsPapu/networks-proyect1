@@ -25,7 +25,17 @@ function Register(req, res){
     res.status(200).send({"message":"Successful Register"});
 
 }
+async function Loggout(req, res){
+    let response = await cli.logout()
+    if (response.status === 205){
+        res.status(205).send({"message":response.message})
+    }
+    else{
+        res.status(401).send({"message":response.message})
+    }
+}
 module.exports = {
     Login,
     Register,
+    Loggout
 };

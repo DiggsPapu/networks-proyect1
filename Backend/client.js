@@ -77,6 +77,24 @@ async function login(username, password) {
         return {"error":"some error", err:err};  
     }
 }
+async function logout() {
+    if (xmpp!==null && xmpp.status === "online") {
+        console.log("it is logged");
+        try {
+            await xmpp.stop();
+            xmpp = null;
+            console.log("Logging out");
+            return {"status":205, "message": "Loggout Successful"}
+        } catch (err) {
+            console.error('Can\'t loggout', err.message);
+            return {"status":401, "message": "Can't loggout"}
+        }
+    } else {
+        console.log("There is no loggout");
+        return {"status":205, "message": "There is nowhere to loggout"}
+    }
+}
 module.exports = {
-    login
+    login,
+    logout,
 }
