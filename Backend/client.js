@@ -30,14 +30,16 @@ async function login(username, password) {
 
     await xmpp.on("online", async () => {
         console.log("Successful Connection");
-        let presence = await xmpp.send(xml("presence",{type: "online"}));
-        console.log(presence);
+        // Send that I am online
+        await xmpp.send(xml("presence",{type: "online"}));
+        // Sync new messages, new friend requests, etc
         await xmpp.on("stanza", async (stanza) => {
+            console.log(stanza)
             if (stanza.is("message")) {
-                //console.log("Stanza recibida:", stanza.toString()); 
                 const body = stanza.getChild("body");
                 const from =  stanza.attrs.from;
                 if (body) {
+                    console.log(body)
                     const messageText = body.children[0];
                     const sender = from.split('@')[0];
                     if(stanza.getChildText("filename")) {
@@ -53,11 +55,15 @@ async function login(username, password) {
                     
                 }
             } else if (stanza.is('presence') && stanza.attrs.type === 'subscribe') {
+                console.log("subscribe: ")
                 const from = stanza.attrs.from;
+                console.log(from)
                 solicitudesamistad.push(from);
             } else if(stanza.is('message') && stanza.getChild('body')) {
                 if (stanza.attrs.type === "groupchat") {
                     const from = stanza.attrs.from;
+                    console.log("")
+                    console.log(from);
                     const body = stanza.getChildText("body");
                     if (from && body) {
                         console.log(`Mensaje de grupo: ${from}: ${body}`);
@@ -166,7 +172,7 @@ async function getContacts() {
     const contacts = {};
     let waitingForPresences = new Set();
 
-    xmpp.on("stanza", (stanza) => {
+    await xmpp.on("stanza", (stanza) => {
         if (stanza.is("iq") && stanza.attrs.id === "roster") {
             const query = stanza.getChild('query');
             if (query) {
@@ -192,13 +198,19 @@ async function getContacts() {
             }
         }
     });
-
     await xmpp.send(iq);
-
-    // Await for messages
+    // Await for roster
     await new Promise(resolve => setTimeout(resolve, 5000));
-    console.log(contacts)
-    return Object.values(contacts);
+    return {"status":200, "contacts":Object.values(contacts)};    
+}
+async function addContact(contact) {
+    if (xmpp){
+        await xmpp.send(xml('presence', { to: `${contact}@${domain}`, type: 'subscribe' }));
+        let message = `Request sent to ${contact}.`;
+        console.log(message);
+        return {status:201, "message": message};
+    }
+    return {status:401, "message": "UNAUTHORIZED, must be logged in"};
 }
 module.exports = {
     // auth
@@ -208,4 +220,5 @@ module.exports = {
     logout,
     // handle contacts
     getContacts,
+    addContact,
 }

@@ -12,6 +12,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import Typography from '@mui/material/Typography'
 import Container from '@mui/material/Container'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
+import { register } from '../services/auth-service'
 
 function Copyright(props) {
   return (
@@ -28,17 +29,13 @@ function Copyright(props) {
 
 // TODO remove, this demo shouldn't need to reset the theme.
 
-const defaultTheme = createTheme();
+const defaultTheme = createTheme()
 
 export default function SignIn() {
   const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      username: data.get('username'),
-      password: data.get('password'),
-    });
-  };
+    event.preventDefault()
+    const data = new FormData(event.currentTarget)
+  }
 
   return (
     <ThemeProvider theme={defaultTheme}>
