@@ -30,14 +30,16 @@ async function login(username, password) {
 
     await xmpp.on("online", async () => {
         console.log("Successful Connection");
-        let presence = await xmpp.send(xml("presence",{type: "online"}));
-        console.log(presence);
+        // Send that I am online
+        await xmpp.send(xml("presence",{type: "online"}));
+        // Sync new messages, new friend requests, etc
         await xmpp.on("stanza", async (stanza) => {
+            console.log(stanza)
             if (stanza.is("message")) {
-                //console.log("Stanza recibida:", stanza.toString()); 
                 const body = stanza.getChild("body");
                 const from =  stanza.attrs.from;
                 if (body) {
+                    console.log(body)
                     const messageText = body.children[0];
                     const sender = from.split('@')[0];
                     if(stanza.getChildText("filename")) {
@@ -53,11 +55,15 @@ async function login(username, password) {
                     
                 }
             } else if (stanza.is('presence') && stanza.attrs.type === 'subscribe') {
+                console.log("subscribe: ")
                 const from = stanza.attrs.from;
+                console.log(from)
                 solicitudesamistad.push(from);
             } else if(stanza.is('message') && stanza.getChild('body')) {
                 if (stanza.attrs.type === "groupchat") {
                     const from = stanza.attrs.from;
+                    console.log("")
+                    console.log(from);
                     const body = stanza.getChildText("body");
                     if (from && body) {
                         console.log(`Mensaje de grupo: ${from}: ${body}`);
@@ -156,17 +162,10 @@ async function getContacts() {
     if (!xmpp) {
         throw new Error("Not Logged In");
     }
-
-    const iq = xml(
-        "iq",
-        { type: "get", id: "roster" },
-        xml("query", { xmlns: "jabber:iq:roster" })
-    );
-
     const contacts = {};
     let waitingForPresences = new Set();
 
-    xmpp.on("stanza", (stanza) => {
+    await xmpp.on("stanza", (stanza) => {
         if (stanza.is("iq") && stanza.attrs.id === "roster") {
             const query = stanza.getChild('query');
             if (query) {
@@ -192,13 +191,67 @@ async function getContacts() {
             }
         }
     });
-
-    await xmpp.send(iq);
-
-    // Await for messages
+    await xmpp.send(
+        xml(
+            "iq",
+            { type: "get", id: "roster" },
+            xml("query", { xmlns: "jabber:iq:roster" })
+        )
+    );
+    // Await for roster
     await new Promise(resolve => setTimeout(resolve, 5000));
-    console.log(contacts)
-    return Object.values(contacts);
+    return {"status":200, "contacts":Object.values(contacts)};    
+}
+async function addContact(contact) {
+    if (xmpp){
+        await xmpp.send(xml('presence', { to: `${contact}@${domain}`, type: 'subscribe' }));
+        let message = `Request sent to ${contact}.`;
+        console.log(message);
+        return {status:201, "message": message};
+    }
+    return {status:401, "message": "UNAUTHORIZED, must be logged in"};
+}
+async function getContactDetails(contactName){
+    let response = await getContacts();
+    let contacts = response.contacts;
+    if (response.status === 200){
+        for (let k = 0; k < contacts.length; k++){
+            let contact = contacts[k];
+            if (contactName === contacts[k].name){
+                return {status:200, contact};
+            };
+        };
+    }
+    else {
+        return response;
+    }
+}
+async function definePresenceMessage(status, presenceMessage){
+    let presenceAttributes = {};
+    let presenceChildren = [];
+    if (status === 'offline') {
+        presenceAttributes.type = 'unavailable';
+    } else if (status !== 'online') {
+        presenceChildren.push(xml('show', {}, status));
+    }
+    presenceChildren.push(xml('status', {}, presenceMessage));
+    const presenceStanza = xml('presence', presenceAttributes, ...presenceChildren);
+    await xmpp.send(presenceStanza);
+    console.log(`New status: "${status}"    Presence message: "${presenceMessage}"`);
+    return {status:205};
+}
+async function sendMessage(user, message){
+    if (!xmpp){
+        return {status:401, "message": "UNAUTHORIZED, must be logged in"};
+    }
+    xmpp.send(
+        xml(
+            'message',
+            { to: `${user}@${domain}`, type: 'chat' },
+            xml('body', {}, message)
+        )
+    );
+    return {status:205, "message": `Message sent to ${user}`};
 }
 module.exports = {
     // auth
@@ -208,4 +261,9 @@ module.exports = {
     logout,
     // handle contacts
     getContacts,
+    addContact,
+    getContactDetails,
+    // user capabilities
+    definePresenceMessage,
+    sendMessage,
 }

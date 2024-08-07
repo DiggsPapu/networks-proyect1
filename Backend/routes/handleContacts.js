@@ -6,5 +6,13 @@ const router = express.Router();
 router.get(
     "/handleContacts/getContacts",  handleContactsController.getContacts
 );
+// Add Contact route -- POST request
+router.post(
+    "/handleContacts/addContact",  handleContactsController.addContact
+);
+// Get Contact Details route -- POST request
+router.post(
+    "/handleContacts/getContactDetails",  handleContactsController.getContactDetails
+);
 
 module.exports = router;

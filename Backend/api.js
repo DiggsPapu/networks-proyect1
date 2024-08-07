@@ -8,6 +8,7 @@ var logger = require('morgan');
 var bodyParser = require('body-parser');
 var authRoutes = require('./routes/auth');
 var handleContactsRoutes = require('./routes/handleContacts');
+var userCapabilitiesRoutes = require('./routes/userCapabilities');
 // Create server
 const app = express();
 
@@ -37,4 +38,5 @@ app.listen(port, ()=>
     );
 app.use(authRoutes);
 app.use(handleContactsRoutes);
+app.use(userCapabilitiesRoutes);
 module.exports = app;
