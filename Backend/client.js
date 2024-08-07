@@ -162,13 +162,6 @@ async function getContacts() {
     if (!xmpp) {
         throw new Error("Not Logged In");
     }
-
-    const iq = xml(
-        "iq",
-        { type: "get", id: "roster" },
-        xml("query", { xmlns: "jabber:iq:roster" })
-    );
-
     const contacts = {};
     let waitingForPresences = new Set();
 
@@ -198,7 +191,13 @@ async function getContacts() {
             }
         }
     });
-    await xmpp.send(iq);
+    await xmpp.send(
+        xml(
+            "iq",
+            { type: "get", id: "roster" },
+            xml("query", { xmlns: "jabber:iq:roster" })
+        )
+    );
     // Await for roster
     await new Promise(resolve => setTimeout(resolve, 5000));
     return {"status":200, "contacts":Object.values(contacts)};    
@@ -212,6 +211,21 @@ async function addContact(contact) {
     }
     return {status:401, "message": "UNAUTHORIZED, must be logged in"};
 }
+async function getContactDetails(contactName){
+    let response = await getContacts();
+    let contacts = response.contacts;
+    if (response.status === 200){
+        for (let k = 0; k < contacts.length; k++){
+            let contact = contacts[k];
+            if (contactName === contacts[k].name){
+                return {status:200, contact};
+            };
+        };
+    }
+    else {
+        return response;
+    }
+}
 module.exports = {
     // auth
     login,
@@ -221,4 +235,5 @@ module.exports = {
     // handle contacts
     getContacts,
     addContact,
+    getContactDetails,
 }

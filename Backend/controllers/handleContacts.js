@@ -25,7 +25,18 @@ async function addContact(req, res){
         res.status(401).send({"message": "error"});
     }
 };
+
+async function getContactDetails(req, res){
+    try {
+        const { contact } = req.body;
+        let response = await cli.getContactDetails(contact);
+        res.status(response.status).send({"contact":response.contact});
+    } catch (error) {
+        res.status(401).send({"message": "error"});
+    };
+};
 module.exports = {
     getContacts,
     addContact,
+    getContactDetails,
 };
