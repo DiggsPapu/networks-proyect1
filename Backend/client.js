@@ -226,6 +226,20 @@ async function getContactDetails(contactName){
         return response;
     }
 }
+async function definePresenceMessage(status, presenceMessage){
+    let presenceAttributes = {};
+    let presenceChildren = [];
+    if (status === 'offline') {
+        presenceAttributes.type = 'unavailable';
+    } else if (status !== 'online') {
+        presenceChildren.push(xml('show', {}, status));
+    }
+    presenceChildren.push(xml('status', {}, presenceMessage));
+    const presenceStanza = xml('presence', presenceAttributes, ...presenceChildren);
+    await xmpp.send(presenceStanza);
+    console.log(`New status: "${status}"    Presence message: "${presenceMessage}"`);
+    return {status:205};
+}
 module.exports = {
     // auth
     login,
@@ -236,4 +250,6 @@ module.exports = {
     getContacts,
     addContact,
     getContactDetails,
+    // user capabilities
+    definePresenceMessage,
 }
