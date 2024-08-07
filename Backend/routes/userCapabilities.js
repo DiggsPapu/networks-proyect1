@@ -9,5 +9,8 @@ router.post(
 router.post(
     "/user/sendMessage",  userCapabilitiesController.sendMessage
 );
+router.post(
+    "/user/sendImage",  userCapabilitiesController.sendImage
+);
 
 module.exports = router;

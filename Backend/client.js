@@ -1,4 +1,5 @@
 const debug = require('@xmpp/debug');
+const fs = require("fs");
 const { client, xml  } = require("@xmpp/client");
 // Create xmpp connection
 xmpp= null;
@@ -251,7 +252,30 @@ async function sendMessage(user, message){
             xml('body', {}, message)
         )
     );
-    return {status:205, "message": `Message sent to ${user}`};
+    return {status:200, "message": `Message sent to ${user}`};
+}
+async function openFile(filePath) {
+    const buffer = await fs.promises.readFile(filePath);
+    return buffer.toString('base64');
+}
+async function sendImage(user, image){
+    if (!xmpp){
+        return {status:401, "message": "UNAUTHORIZED, must be logged in"};
+    }
+    openFile(image).then(base64Data => {
+        xmpp.send(xml(
+                'message',
+                { to: `${user}@${domain}`, type: 'chat' },
+                xml('filename', {}, 'chems.png'),
+                xml('filedata', {}, base64Data)
+            )
+        );
+        console.log(`Image sent to ${user}.`);
+    }).catch(err => {
+        console.error('Error sending image:', err.message);
+        return {status:400, "message": `Couldn't send image to ${user}`};
+    });
+    return {status:200, "message": `Image sent to ${user}`};
 }
 module.exports = {
     // auth
@@ -266,4 +290,5 @@ module.exports = {
     // user capabilities
     definePresenceMessage,
     sendMessage,
+    sendImage,
 }

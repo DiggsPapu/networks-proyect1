@@ -19,10 +19,24 @@ async function sendMessage(req, res){
         res.status(response.status).send({"message":response.message});
     }
     catch(err) {
-        res.status(401).send({"message":"Couldn't change the presence message and status"});
+        console.log(err);
+        res.status(401).send({"message":"Couldn't send the message"});
+    }
+}
+async function sendImage(req, res){
+    try {
+        const { user, image } = req.body;
+        // Make a function to save image
+        let response = await cli.sendImage(user, "./images/image.jpg");
+        res.status(response.status).send({"message":response.message});
+    }
+    catch(err) {
+        console.log(err);
+        res.status(401).send({"message":"Couldn't send the image"});
     }
 }
 module.exports = {
     definePresenceMessage,
     sendMessage,
+    sendImage
 };
