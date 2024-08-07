@@ -7,6 +7,7 @@ var path = require('path');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 var authRoutes = require('./routes/auth');
+var handleContactsRoutes = require('./routes/handleContacts');
 // Create server
 const app = express();
 
@@ -35,4 +36,5 @@ app.listen(port, ()=>
     console.log("App listening on port "+port)
     );
 app.use(authRoutes);
+app.use(handleContactsRoutes);
 module.exports = app;

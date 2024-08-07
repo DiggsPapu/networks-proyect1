@@ -1,5 +1,5 @@
 const debug = require('@xmpp/debug');
-const { client, xml, inBandRegistration  } = require("@xmpp/client");
+const { client, xml  } = require("@xmpp/client");
 // Create xmpp connection
 xmpp= null;
 username= null;
@@ -94,6 +94,7 @@ async function deleteAccount(){
         console.error('Error while deleting account:', err.message);
         return {stauts:403, "message": err.message};
     });
+    xmpp = null;
     return {status:205, "message": `Account ${username}, successfully deleted`};
 }
 // Register User
@@ -151,9 +152,60 @@ async function logout() {
         return {"status":205, "message": "There is nowhere to loggout"}
     }
 }
+async function getContacts() {
+    if (!xmpp) {
+        throw new Error("Not Logged In");
+    }
+
+    const iq = xml(
+        "iq",
+        { type: "get", id: "roster" },
+        xml("query", { xmlns: "jabber:iq:roster" })
+    );
+
+    const contacts = {};
+    let waitingForPresences = new Set();
+
+    xmpp.on("stanza", (stanza) => {
+        if (stanza.is("iq") && stanza.attrs.id === "roster") {
+            const query = stanza.getChild('query');
+            if (query) {
+                query.getChildren("item").forEach((item) => {
+                    const jid = item.attrs.jid;
+                    const name = item.attrs.name || jid.split("@")[0];
+                    const subscription = item.attrs.subscription;
+
+                    contacts[jid] = { name, jid, presence: "offline", subscription: subscription || "none" };
+                    waitingForPresences.add(jid);
+                });
+            }
+        } else if (stanza.is("presence")) {
+            const from = stanza.attrs.from;
+            if (from in contacts) {
+                contacts[from].presence = stanza.attrs.type || "online";
+                waitingForPresences.delete(from);
+            }
+        } else if (stanza.is("presence") && stanza.attrs.type === "subscribe") {
+            const from = stanza.attrs.from;
+            if (from in contacts) {
+                contacts[from].subscription = "pending";
+            }
+        }
+    });
+
+    await xmpp.send(iq);
+
+    // Await for messages
+    await new Promise(resolve => setTimeout(resolve, 5000));
+    console.log(contacts)
+    return Object.values(contacts);
+}
 module.exports = {
+    // auth
     login,
     signUp,
     deleteAccount,
     logout,
+    // handle contacts
+    getContacts,
 }

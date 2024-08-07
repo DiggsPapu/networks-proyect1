@@ -1,0 +1,16 @@
+var cli = require('../client.js');
+// Your "fix" is to disable Node from rejecting self-signed certificates by allowing ANY unauthorised certificate. https://stackoverflow.com/questions/35633829/node-js-error-process-env-node-tls-reject-unauthorized-what-does-this-mean
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
+async function getContacts(req, res){
+    try {
+        let response = await cli.getContacts();
+        console.log(response)
+        res.status(200).send({"message":""});
+    } catch (error) {
+        res.status(401).send({"message": "UNAUTHORIZED"});
+    }
+}
+module.exports = {
+    getContacts,
+};
