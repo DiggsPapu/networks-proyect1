@@ -10,6 +10,10 @@ router.post(
 router.post(
     "/auth/register",  authController.Register
 );
+// Register route -- POST request
+router.get(
+    "/auth/deleteAccount",  authController.DeleteAccount
+);
 // Logout route -- GET request
 router.get(
     "/auth/logout",  authController.Loggout

@@ -8,13 +8,13 @@ async function Login(req, res){
         let response = await cli.login(username, password);
         if (response.status === 401){
             console.log("UNAUTHORIZED");
-            res.status(401).send({"message": "UNAUTHORIZED"});
+            res.status(response.status).send({"message": response.message});
         }
         else if (response.status === 200){
-            res.status(200).send({"message":"Successful Connection"});
+            res.status(response.status).send({"message": response.message});
         }
         else{
-            res.status(405).send({"message": "Some error"});
+            res.status(response.status).send({"message": response.message});
         }
     } catch (error) {
         res.status(401).send({"message": "UNAUTHORIZED"});
@@ -24,10 +24,19 @@ async function Register(req, res){
     const { username, password } = req.body;
     let response = await cli.signUp(username, password);
     if (response.status === 409){
-        res.status(409).send({"message": response.message})
+        res.status(response.status).send({"message": response.message});
     }
     else {
-        res.status(200).send({"message":"Successful Register"});
+        res.status(response.status).send({"message": response.message});
+    }
+}
+async function DeleteAccount(req, res){
+    let response = await cli.deleteAccount();
+    if (response.status === 205){
+        res.status(response.status).send({"message": response.message});
+    }
+    else {
+        res.status(response.status).send({"message": response.message});
     }
 }
 async function Loggout(req, res){
@@ -42,5 +51,6 @@ async function Loggout(req, res){
 module.exports = {
     Login,
     Register,
+    DeleteAccount,
     Loggout
 };

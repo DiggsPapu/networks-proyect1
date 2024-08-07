@@ -78,7 +78,23 @@ async function login(username, password) {
     }
 }
 async function deleteAccount(){
-
+    if (!xmpp) {
+        console.log('is not logged in');
+        return {status:401, "message": "Not logged in"};
+    }
+    const deleteStanza = xml(
+        'iq',
+        { type: 'set', id: 'delete_account' },
+        xml('query', { xmlns: 'jabber:iq:register' },
+            xml('remove')
+        )
+    );  
+    xmpp.send(deleteStanza).catch((err) => {
+        xmpp.removeListener('error', errorHandler);
+        console.error('Error while deleting account:', err.message);
+        return {stauts:403, "message": err.message};
+    });
+    return {status:205, "message": `Account ${username}, successfully deleted`};
 }
 // Register User
 async function signUp(username, password) {
@@ -138,5 +154,6 @@ async function logout() {
 module.exports = {
     login,
     signUp,
+    deleteAccount,
     logout,
 }
