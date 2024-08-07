@@ -1,5 +1,5 @@
 const debug = require('@xmpp/debug');
-const { client, xml } = require("@xmpp/client");
+const { client, xml, inBandRegistration  } = require("@xmpp/client");
 // Create xmpp connection
 xmpp= null;
 username= null;
@@ -77,6 +77,47 @@ async function login(username, password) {
         return {"error":"some error", err:err};  
     }
 }
+async function deleteAccount(){
+
+}
+// Register User
+async function signUp(username, password) {
+    username = username;
+    password = password;
+    console.log(username, password)
+    xmpp = client({
+        service: service,
+        domain: domain,
+        username: username,
+        password: password,
+    });
+    // User already exists
+    try {
+        await xmpp.start();
+        console.error(`User ${username} already exists`);
+        await xmpp.stop();
+        return {"status":409, "message": `${username} already exists`};
+    }
+    // User doesn't exists 
+    catch (error) {
+        const registerStanza = xml(
+            'iq',
+            { type: 'set', id: 'register' },
+            xml('query', { xmlns: 'jabber:iq:register' },
+                xml('username', {}, username),
+                xml('password', {}, password),
+            )
+        );
+
+        xmpp.send(registerStanza).then(() => {
+            resolve(); 
+        }).catch((err) => {
+            console.log(err)
+        });
+        return {"status":200, "message": `${username} successfully registered`}; 
+    }
+}
+
 async function logout() {
     if (xmpp!==null && xmpp.status === "online") {
         console.log("it is logged");
@@ -96,5 +137,6 @@ async function logout() {
 }
 module.exports = {
     login,
+    signUp,
     logout,
 }

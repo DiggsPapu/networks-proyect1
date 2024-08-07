@@ -8,9 +8,7 @@ router.post(
 );
 // Register route -- POST request
 router.post(
-    "/auth/register",  (req, res)=>{
-        res.status(200).send("hola")
-    }
+    "/auth/register",  authController.Register
 );
 // Logout route -- GET request
 router.get(

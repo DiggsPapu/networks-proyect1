@@ -20,10 +20,15 @@ async function Login(req, res){
         res.status(401).send({"message": "UNAUTHORIZED"});
     }
 }
-function Register(req, res){
-    const { userName, password } = req.body;
-    res.status(200).send({"message":"Successful Register"});
-
+async function Register(req, res){
+    const { username, password } = req.body;
+    let response = await cli.signUp(username, password);
+    if (response.status === 409){
+        res.status(409).send({"message": response.message})
+    }
+    else {
+        res.status(200).send({"message":"Successful Register"});
+    }
 }
 async function Loggout(req, res){
     let response = await cli.logout()
