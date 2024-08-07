@@ -6,5 +6,8 @@ const router = express.Router();
 router.post(
     "/user/defPresenceMessage",  userCapabilitiesController.definePresenceMessage
 );
+router.post(
+    "/user/sendMessage",  userCapabilitiesController.sendMessage
+);
 
 module.exports = router;

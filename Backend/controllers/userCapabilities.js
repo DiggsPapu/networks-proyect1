@@ -12,6 +12,17 @@ async function definePresenceMessage(req, res){
         res.status(401).send({"message":"Couldn't change the presence message and status"});
     }
 }
+async function sendMessage(req, res){
+    try {
+        const { user, message } = req.body;
+        let response = await cli.sendMessage(user, message);
+        res.status(response.status).send({"message":response.message});
+    }
+    catch(err) {
+        res.status(401).send({"message":"Couldn't change the presence message and status"});
+    }
+}
 module.exports = {
-    definePresenceMessage
+    definePresenceMessage,
+    sendMessage,
 };

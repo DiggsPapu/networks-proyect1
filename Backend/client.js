@@ -240,6 +240,19 @@ async function definePresenceMessage(status, presenceMessage){
     console.log(`New status: "${status}"    Presence message: "${presenceMessage}"`);
     return {status:205};
 }
+async function sendMessage(user, message){
+    if (!xmpp){
+        return {status:401, "message": "UNAUTHORIZED, must be logged in"};
+    }
+    xmpp.send(
+        xml(
+            'message',
+            { to: `${user}@${domain}`, type: 'chat' },
+            xml('body', {}, message)
+        )
+    );
+    return {status:205, "message": `Message sent to ${user}`};
+}
 module.exports = {
     // auth
     login,
@@ -252,4 +265,5 @@ module.exports = {
     getContactDetails,
     // user capabilities
     definePresenceMessage,
+    sendMessage,
 }
