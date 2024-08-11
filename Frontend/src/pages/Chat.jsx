@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import ChatHead from '../components/ChatHead'
 import Message from '../components/Message'
 import ChatFooter from '../components/ChatFooter'
-import { logout } from '../services/auth-service'
+import { deleteAccount, logout } from '../services/auth-service'
 import GlobalStyle from '../GlobalStyle'
 import styled from 'styled-components'
 
@@ -125,11 +125,19 @@ class Chat extends Component {
       this.props.navigate('/login')
     }
   }
+  deleteAccount = async () => {
+    const success = await deleteAccount()
+    if (success) {
+      localStorage.clear()
+      this.props.navigate('/login')
+    }
+  }
   render() {
     return (
       <Fragment>
         <GlobalStyle />
         <button type='submit' onClick={this.logout}>Log out</button>
+        <button type='submit' onClick={this.deleteAccount}>Delete Account</button>
         <Container>
           <ChatContainer
             toggle={this.state.toggleChat}

@@ -13,6 +13,7 @@ import Typography from '@mui/material/Typography'
 import Container from '@mui/material/Container'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import { register } from '../services/auth-service'
+import { useNavigate } from "react-router-dom"
 
 function Copyright(props) {
   return (
@@ -30,12 +31,21 @@ function Copyright(props) {
 // TODO remove, this demo shouldn't need to reset the theme.
 
 const defaultTheme = createTheme()
-
 export default function SignIn() {
-  const handleSubmit = (event) => {
-    event.preventDefault()
-    const data = new FormData(event.currentTarget)
-  }
+  const navigate = useNavigate()
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget; // Get the form element
+    const data = new FormData(form); // Pass the form element to FormData
+    let username = data.get('username');
+    let password = data.get('password');
+    const success = await register(username, password);
+    if (success) {
+      // Initialize the access & refresh token in localstorage.      
+      localStorage.clear();
+      navigate('/login');
+    }
+  };
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -57,14 +67,14 @@ export default function SignIn() {
           </Typography>
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  id="username"
-                  label="username"
-                  name="username"
-                  autoComplete="username"
-                />
+              <TextField
+                required
+                fullWidth
+                id="username"
+                label="Username"
+                name="username"
+                autoComplete="username"
+              />
               <Grid item xs={12}>
                 <TextField
                   required
@@ -73,7 +83,7 @@ export default function SignIn() {
                   label="Password"
                   type="password"
                   id="password"
-                  autoComplete="new-password"
+                  autoComplete="password"
                 />
               </Grid>
               <Grid item xs={12}>

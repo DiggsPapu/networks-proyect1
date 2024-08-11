@@ -19,5 +19,16 @@ export async function logout() {
 export async function register(username, password) {
   const response = await axios.post('http://localhost:6363/auth/register', { "username":username, "password":password })
   console.log(response)
-  return response.data
+  if (response.status !== 409){
+    return true
+  }
+  return false
+}
+export async function deleteAccount() {
+  const response = await axios.get('http://localhost:6363/auth/deleteAccount')
+  if (response.status === 205){
+    console.log("prueba")
+    return true
+  }
+  return false
 }
