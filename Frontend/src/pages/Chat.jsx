@@ -1,9 +1,9 @@
-import React, { useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useRef, useState } from 'react';import { useNavigate } from 'react-router-dom';
 import { add_contact, delete_account, logOut } from '../services/auth-service';
 import styled from 'styled-components';
 import ContactBar from '../components/ContactBar';
 import Header from '../components/Header';
+import ChatInstance from '../components/ChatInstance';
 
 const heightToggled = `
     height: 0%;
@@ -38,9 +38,9 @@ export const ChatContainer = styled.div`
     border-radius: 4px 4px 0px 0px;
     flex-direction: column;
     margin-right: 10px;
-
-    ${props => props.toggle === true ? heightContainerToggled : heightContainer}
     transition: all 0.5s ease;
+
+    ${props => props.toggle ? heightContainerToggled : heightContainer}
 `;
 
 export const ChatBody = styled.div`
@@ -49,47 +49,30 @@ export const ChatBody = styled.div`
     min-height: 60%;
     max-height: 60%;
     overflow: auto;
+    transition: all 0.5s ease;
 
-    ${props => props.toggle === true ? heightToggled : height}
+    ${props => props.toggle ? heightToggled : height}
 `;
 
-function getQuote(numberMessages) {
-  const nouns = ["car", "horse", "apple", "person", "chimp"];
-  const adjectives = ["red", "fast", "lonely", "hungry", "insane"];
-
-  const messages = [];
-
-  for (let i = 0; i <= numberMessages; i++) {
-      const randomNounIndex = Math.floor(Math.random() * nouns.length);
-      const randomAdjectiveIndex = Math.floor(Math.random() * adjectives.length);
-      const retVal = i % 2 === 0 ?
-                    `The ${nouns[randomNounIndex]} is ${adjectives[randomAdjectiveIndex]} and 
-                    ${nouns[randomNounIndex]} is ${adjectives[randomAdjectiveIndex]} and
-                    ${nouns[randomNounIndex]} is ${adjectives[randomAdjectiveIndex]}`
-                  : 
-                    `${nouns[randomNounIndex]} is ${adjectives[randomAdjectiveIndex]}`;
-      messages.push({userId: i % 2 === 0 ? 1 : 2, message: retVal});
-  }
-
-  return messages;
-}
 
 const Chat = () => {
   const navigate = useNavigate();
   const [name] = useState(localStorage.getItem("username"));
-  const [messages, setMessages] = useState(getQuote(10));
   const [toggleChat, setToggleChat] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const [currentChat, setCurrentChat] = useState(null);
+
   const addContact = async (event) => {
     event.preventDefault();
-    const form = event.currentTarget; // Get the form element
-    const data = new FormData(form); // Pass the form element to FormData
-    let username = data.get('contactUsername');
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    const username = data.get('contactUsername');
     const success = await add_contact(username);
     if (success) {
       setIsFormVisible(false);
     }
   };
+
   const onSubmitMessage = (msg) => {
     setMessages((prevMessages) => [
       ...prevMessages,
@@ -124,9 +107,14 @@ const Chat = () => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column'}}>
       <Header/>
-      <ContactBar/>
-      <>
-      </>        
+      <ContactBar setContact={(contact) => {
+        setCurrentChat(contact)
+        console.log(contact)
+      }
+        } />
+      {
+        currentChat && <ChatInstance contact={currentChat} />
+      }
     </div>
   );
 };

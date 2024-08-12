@@ -1,28 +1,19 @@
-import React from 'react'
-import { FaBars } from 'react-icons/fa'
-import styled from 'styled-components'
 
-const heightToggled = `
-    height: 100%;
-`
-
-const height = `
-    height: 20%;
-`
+import React from 'react';
+import { FaBars } from 'react-icons/fa';
+import styled from 'styled-components';
 
 export const Head = styled.div`
     display: flex;
     align-items: center;
     width: 100%;
-
-    ${props => props.toggle === true ? heightToggled : height}   
-	transition: all 0.5s ease; 
-
+    transition: all 0.5s ease;
     padding: 8px;
     justify-content: space-between;
-
     border-radius: 4px 4px 0px 0px;
-    background-color: rgba(0,0,0,.03); 
+    background-color: rgba(0,0,0,.03);
+
+    ${props => props.toggle ? 'height: 100%;' : 'height: 20%;'} 
 
     div:first-child {
         display: flex;
@@ -48,24 +39,16 @@ export const Head = styled.div`
     }
 `;
 
-const h = ({toggle, children}) => (
-    <Head 
-        toggle={toggle}
-    >
-        {children}
-    </Head>
-)
-const ChatHead = props => (
-    <Head toggle={props.toggle}>
+const ChatHead = ({ name, toggle, onClick, presence }) => (
+    <Head toggle={toggle}>
         <div>
-            <span>{props.name}&nbsp;</span>
-            <span>online</span>
+            <span>{name}&nbsp;</span>
+            <span>{presence}</span>
         </div>
         <div>
-            <FaBars onClick={props.onClick}/>
+            <FaBars onClick={onClick} />
         </div>
     </Head>
 );
 
 export default ChatHead;
-

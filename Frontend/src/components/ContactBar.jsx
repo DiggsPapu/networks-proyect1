@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-export default function ContactBar() {
+export default function ContactBar({setContact}) {
     const [contacts, setContacts] = useState(JSON.parse(localStorage.getItem("contacts") || "[]"));
 
     return (
@@ -16,8 +16,9 @@ export default function ContactBar() {
                 {
                     contacts && contacts.length > 0 ?
                     contacts.map((contact, index) => (
-                        <li key={index}>{contact.jid}</li>
-                    ))
+                        <button key={index} style={{marginTop:"10%"}} onClick={()=>{setContact(contacts[index])}}>{contact.jid}</button>
+                        )
+                    )
                     : <>No Contacts</>
                 }
             </ul>
