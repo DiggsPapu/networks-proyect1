@@ -9,6 +9,16 @@ export async function login(username, password) {
   }
   return false
 }
+export async function get_contacts() {
+  const response = await axios.get('http://localhost:6363/handleContacts/getContacts')
+  if (response.status === 200){
+    console.log(response)
+    localStorage.setItem("contacts", response["data"]["contacts"])
+    return true
+  }
+  // retry
+  get_contacts()
+}
 export async function logOut() {
   const response = await axios.get('http://localhost:6363/auth/logout', {})
   console.log(response)

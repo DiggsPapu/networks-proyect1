@@ -13,7 +13,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import Typography from '@mui/material/Typography'
 import Container from '@mui/material/Container'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
-import { login } from '../services/auth-service'
+import { get_contacts, login } from '../services/auth-service'
 
 function Copyright(props) {
   return (
@@ -45,6 +45,7 @@ export default function Login() {
       localStorage.clear()
       localStorage.setItem('username', username)
       localStorage.setItem('password', password)
+      get_contacts()
       navigate('/chat')
     }
   }
