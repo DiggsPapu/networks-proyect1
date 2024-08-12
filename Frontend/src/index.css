@@ -26,7 +26,7 @@ body {
   margin: 0;
   display: flex;
   place-items: center;
-  min-width: 320px;
+  width: 100vw;
   min-height: 100vh;
 }
 
@@ -65,5 +65,23 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+{
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  width: 100vw;
+  height: 100%;  
+}
+
+body {
+  background-image: linear-gradient(to right, #f88a1a, #F55F5E);
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
 }
 

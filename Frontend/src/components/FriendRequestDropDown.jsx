@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { accept_friend_request } from "../services/auth-service";
+import { accept_friend_request, get_contacts } from "../services/auth-service";
 
 export default function FriendRequestDropDown() {
     const [currentFriendRequest, setCurrentFriendRequest] = useState('');
@@ -10,11 +10,13 @@ export default function FriendRequestDropDown() {
     const friendRequestAccepted = async (friendRequest) => {
         await accept_friend_request(friendRequest);
         setFriendList(friendList.filter((name) => name !== friendRequest));
+        await get_contacts()
     };
 
-    const friendRequestRejected = (friendRequest) => {
+    const friendRequestRejected = async (friendRequest) => {
         // Handle the rejection logic here (if any)
         setFriendList(friendList.filter((name) => name !== friendRequest));
+        await get_contacts()
     };
 
     return (

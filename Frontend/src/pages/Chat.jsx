@@ -1,12 +1,9 @@
 import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ChatHead from '../components/ChatHead';
-import Message from '../components/Message';
-import ChatFooter from '../components/ChatFooter';
 import { add_contact, delete_account, logOut } from '../services/auth-service';
-import GlobalStyle from '../GlobalStyle';
 import styled from 'styled-components';
-import FriendRequestDropDown from '../components/FriendRequestDropDown';
+import ContactBar from '../components/ContactBar';
+import Header from '../components/Header';
 
 const heightToggled = `
     height: 0%;
@@ -125,42 +122,12 @@ const Chat = () => {
   };
 
   return (
-    <>
-      <GlobalStyle />
-      <button type='button' onClick={logout}>Log out</button>
-      <button type='button' onClick={deleteAccount}>Delete Account</button>
+    <div style={{ display: 'flex', flexDirection: 'column'}}>
+      <Header/>
+      <ContactBar/>
       <>
-        <button onClick={toggleFormVisibility}>
-          AddContact
-        </button>
-        {isFormVisible && (
-          <form onSubmit={addContact}>
-            <div>
-              <label htmlFor="contactUsername">Add contact's user name:</label>
-              <input type="text" id="contactUsername" name="contactUsername" />
-            </div>
-            <button type="submit">Submit</button>
-          </form>
-        )}
-      </>
-      <>
-      <FriendRequestDropDown />
-        <ChatContainer toggle={toggleChat}>
-          <ChatHead 
-            name={name} 
-            toggle={toggleChat}
-            onClick={handleToggle}
-          />
-          <ChatBody toggle={toggleChat}>
-            <Message messages={messages} />
-          </ChatBody>
-          <ChatFooter 
-            toggle={toggleChat}
-            onSubmitMessage={onSubmitMessage}
-          />
-        </ChatContainer>
       </>        
-    </>
+    </div>
   );
 };
 

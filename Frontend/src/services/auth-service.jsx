@@ -21,7 +21,7 @@ export async function get_contacts() {
   const response = await axios.get('http://localhost:6363/handleContacts/getContacts')
   if (response.status === 200){
     console.log(response)
-    localStorage.setItem("contacts", response["data"]["contacts"])
+    localStorage.setItem("contacts", JSON.stringify(response["data"]["contacts"]))
     return true
   }
   // retry
