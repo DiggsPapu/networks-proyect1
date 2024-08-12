@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 
-export default function ContactBar({setContact}) {
-    const [contacts, setContacts] = useState(JSON.parse(localStorage.getItem("contacts") || "[]"));
+export default function ContactBar({setContact, contacts}) {
 
     return (
         <div style={{

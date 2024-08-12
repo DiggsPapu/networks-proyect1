@@ -1,9 +1,9 @@
 import React, { useState } from "react"
 import FriendRequestDropDown from '../components/FriendRequestDropDown'
 import { useNavigate } from 'react-router-dom'
-import { add_contact, delete_account, logOut } from '../services/auth-service'
+import { add_contact, delete_account, get_contacts, logOut } from '../services/auth-service'
 
-export default function Header(){
+export default function Header({contacts, setContacts}){
     const navigate = useNavigate();
     const [toggleChat, setToggleChat] = useState(false);
     const [isFormVisible, setIsFormVisible] = useState(false);
@@ -14,7 +14,8 @@ export default function Header(){
         let username = data.get('contactUsername');
         const success = await add_contact(username);
         if (success) {
-        setIsFormVisible(false);
+            await get_contacts();
+            setIsFormVisible(false);
         }
     };
 
@@ -51,6 +52,8 @@ export default function Header(){
             justifyContent: 'center',
             zIndex: '1000',
         }}>
+            
+            <div style={{position:'fixed', top:'0', left:'0'}}>{localStorage.getItem("username")}</div>
             <button type='button' onClick={logout}>Log out</button>
             <button type='button' onClick={deleteAccount}>Delete Account</button>
             <>
@@ -67,7 +70,7 @@ export default function Header(){
                 </form>
                 )}
             </>
-            <FriendRequestDropDown />
+            <FriendRequestDropDown contacts={contacts} setContacts={setContacts}/>
         </header>
     )
 }

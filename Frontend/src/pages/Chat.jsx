@@ -57,19 +57,20 @@ export const ChatBody = styled.div`
 
 const Chat = () => {
   const navigate = useNavigate();
-  const [name] = useState(localStorage.getItem("username"));
-  const [toggleChat, setToggleChat] = useState(false);
-  const [isFormVisible, setIsFormVisible] = useState(false);
-  const [currentChat, setCurrentChat] = useState(null);
+  const [name] = useState(localStorage.getItem("username"))
+  const [toggleChat, setToggleChat] = useState(false)
+  const [isFormVisible, setIsFormVisible] = useState(false)
+  const [currentChat, setCurrentChat] = useState(null)
+  const [contacts, setContacts] = useState(JSON.parse(localStorage.getItem("contacts") || "[]"))
 
   const addContact = async (event) => {
     event.preventDefault();
-    const form = event.currentTarget;
-    const data = new FormData(form);
-    const username = data.get('contactUsername');
-    const success = await add_contact(username);
+    const form = event.currentTarget
+    const data = new FormData(form)
+    const username = data.get('contactUsername')
+    const success = await add_contact(username)
     if (success) {
-      setIsFormVisible(false);
+      setIsFormVisible(false)
     }
   };
 
@@ -81,7 +82,7 @@ const Chat = () => {
   };
 
   const handleToggle = () => {
-    setToggleChat(!toggleChat);
+    setToggleChat(!toggleChat)
   };
 
   const logout = async () => {
@@ -93,7 +94,7 @@ const Chat = () => {
   };
 
   const deleteAccount = async () => {
-    const success = await delete_account();
+    const success = await delete_account()
     if (success) {
       localStorage.clear();
       navigate('/login');
@@ -101,17 +102,16 @@ const Chat = () => {
   };
 
   const toggleFormVisibility = () => {
-    setIsFormVisible(!isFormVisible);
+    setIsFormVisible(!isFormVisible)
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column'}}>
-      <Header/>
+      <Header contacts={contacts} setContacts={(contacts)=>{setContacts(contacts)}}/>
       <ContactBar setContact={(contact) => {
         setCurrentChat(contact)
-        console.log(contact)
-      }
-        } />
+      }} 
+      contacts={contacts}/>
       {
         currentChat && <ChatInstance contact={currentChat} />
       }

@@ -9,22 +9,10 @@ const DropdownContainer = styled.div`
     display: inline-block;
 `;
 
-const DropdownButton = styled.button`
-    padding: 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-
-    &:hover {
-        background-color: #0056b3;
-    }
-`;
 
 const DropdownContent = styled.ul`
     display: ${props => props.open ? 'block' : 'none'};
     position: absolute;
-    border: 1px solid #ddd;
     border-radius: 4px;
     width: 100%;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -69,40 +57,50 @@ const DropdownItem = styled.li`
     }
 `;
 
-export default function FriendRequestDropDown() {
+export default function FriendRequestDropDown({setContacts, contacts}) {
     const [friendList, setFriendList] = useState(JSON.parse(localStorage.getItem("requests") || "[]"))
+    const filterFriendList = () => {        
+        let filteredFriends = []
+        if (contacts.length>0){
+            contacts.map((contact)=>{
+                if (!friendList.includes(contact.jid)){
+                    filteredFriends.push(contact.jid)
+                }
+                else{
+                    console.log(contact.jid)
+                }
+            })
+        }
+        else{
+            filteredFriends = friendList
+        }
+        setFriendList(filteredFriends)
+    }
     // Filter friend list
     useEffect(() => {
-        const contacts = JSON.parse(localStorage.getItem("contacts") || "[]")
-        
-        const filteredFriends = []
-        contacts.map((contact)=>{
-            if (!friendList.includes(contact.jid)){
-                filteredFriends.push(contact.jid)
-            }
-        })
-        setFriendList(filteredFriends)
+        filterFriendList()
     },[]);
 
     const [open, setOpen] = useState(false)
 
     const friendRequestAccepted = async (friendRequest) => {
-        await accept_friend_request(friendRequest);
-        setFriendList(friendList.filter((name) => name !== friendRequest));
-        await get_contacts();
+        await accept_friend_request(friendRequest)
+        setFriendList(friendList.filter((name) => name !== friendRequest))
+        await get_contacts(JSON.parse(localStorage.getItem("contacts") || "[]"))
+        setContacts()
     };
 
     const friendRequestRejected = async (friendRequest) => {
         // Handle the rejection logic here (if any)
-        setFriendList(friendList.filter((name) => name !== friendRequest));
-        await get_contacts();
-    };
+        setFriendList(friendList.filter((name) => name !== friendRequest))
+        await get_contacts()
+    }
 
     return (
         <DropdownContainer>
-            <DropdownButton onClick={() => setOpen(!open)}>
+            <button onClick={() => setOpen(!open)}>
                 Friend Requests
-            </DropdownButton>
+            </button>
             <DropdownContent open={open}>
                 {friendList.length > 0 ? (
                     friendList.map((friendRequest, index) => (
