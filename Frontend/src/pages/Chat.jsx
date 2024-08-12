@@ -6,6 +6,7 @@ import ChatFooter from '../components/ChatFooter';
 import { add_contact, delete_account, logOut } from '../services/auth-service';
 import GlobalStyle from '../GlobalStyle';
 import styled from 'styled-components';
+import FriendRequestDropDown from '../components/FriendRequestDropDown';
 
 const heightToggled = `
     height: 0%;
@@ -143,6 +144,7 @@ const Chat = () => {
         )}
       </>
       <>
+      <FriendRequestDropDown />
         <ChatContainer toggle={toggleChat}>
           <ChatHead 
             name={name} 
