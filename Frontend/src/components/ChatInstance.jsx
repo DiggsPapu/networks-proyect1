@@ -28,9 +28,10 @@ export const ChatContainer = styled.div`
     border-radius: 4px 4px 0px 0px;
     flex-direction: column;
     position: fixed;
-    top: 60px;
+    bottom: 0;
     right: 0;
     transition: all 0.5s ease;
+    margin-right:2px;
 
     ${props => props.toggle ? heightContainerToggled : heightContainer}
 `;
