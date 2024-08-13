@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { accept_friend_request, get_contacts } from "../services/auth-service";
+import React, { useEffect, useState } from "react"
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { acceptFriendRequest, getContacts } from "../services/services"
 import styled from 'styled-components';
 
 // Styled components for dropdown
@@ -84,9 +84,9 @@ export default function FriendRequestDropDown({setContacts, contacts}) {
     const [open, setOpen] = useState(false)
 
     const friendRequestAccepted = async (friendRequest) => {
-        await accept_friend_request(friendRequest)
+        await acceptFriendRequest(friendRequest)
         setFriendList(friendList.filter((name) => name !== friendRequest))
-        await get_contacts(JSON.parse(localStorage.getItem("contacts") || "[]"))
+        await getContacts(JSON.parse(localStorage.getItem("contacts") || "[]"))
         setContacts()
     };
 

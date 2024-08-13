@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ChatHead from '../components/ChatHead';
 import Message from '../components/Message';
 import ChatFooter from '../components/ChatFooter';
 import styled from 'styled-components';
+import { sendMessage } from "../services/services"
 
 const heightToggled = `
     height: 0%;
@@ -62,15 +63,43 @@ function getQuote(numberMessages) {
   
     return messages;
   }
-export default function ChatInstance({ contact }) {
-    const [messages, setMessages] = useState(getQuote(10));
+export default function ChatInstance({ contact, type="user" }) {
+    const [messages, setMessages] = useState([]);
     const [toggleChat, setToggleChat] = useState(false);
-
-    const onSubmitMessage = (msg) => {
-        setMessages((prevMessages) => [
-            ...prevMessages,
-            { userId: 1, message: msg }
-        ]);
+    const [messagesId, setMessagesId] = useState([]);
+    const [messageChanges, setMessageChanges] = useState(localStorage.getItem("messages"));
+    useEffect(()=>{
+        let mes = JSON.parse(localStorage.getItem("messages"));
+            console.log(mes)
+            mes.map((message)=>{
+                if(message.from.split("@")[0]===contact.name && !messagesId.includes(message.id)){
+                    setMessagesId([...messagesId, message.id]);
+                    setMessages((prevMessages) => [
+                        ...prevMessages,
+                        { userId: 2, message: message.body }
+                    ]);
+                }
+            })
+    },[localStorage.getItem("messages")])
+    const onSubmitMessage = async (msg) => {
+        console.log(contact)
+        if(await sendMessage(contact.name, msg, type).then(setTimeout(5000))){
+            setMessages((prevMessages) => [
+                ...prevMessages,
+                { userId: 1, message: msg }
+            ]);
+            let mes = JSON.parse(localStorage.getItem("messages"));
+            console.log(mes)
+            mes.map((message)=>{
+                if(message.from.split("@")[0]===contact.name && !messagesId.includes(message.id)){
+                    setMessagesId([...messagesId, message.id]);
+                    setMessages((prevMessages) => [
+                        ...prevMessages,
+                        { userId: 2, message: message.body }
+                    ]);
+                }
+            })
+        };
     };
 
     const handleToggle = () => {

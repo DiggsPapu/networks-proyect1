@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';import { useNavigate } from 'react-router-dom';
-import { add_contact, delete_account, logOut } from '../services/auth-service';
+import { addContact, deleteAccount, logout } from '../services/services';
 import styled from 'styled-components';
 import ContactBar from '../components/ContactBar';
 import Header from '../components/Header';
@@ -68,7 +68,7 @@ const Chat = () => {
     const form = event.currentTarget
     const data = new FormData(form)
     const username = data.get('contactUsername')
-    const success = await add_contact(username)
+    const success = await addContact(username)
     if (success) {
       setIsFormVisible(false)
     }
@@ -86,7 +86,7 @@ const Chat = () => {
   };
 
   const logout = async () => {
-    const success = await logOut();
+    const success = await logout();
     if (success) {
       localStorage.clear();
       navigate('/login');
@@ -94,7 +94,7 @@ const Chat = () => {
   };
 
   const deleteAccount = async () => {
-    const success = await delete_account()
+    const success = await deleteAccount()
     if (success) {
       localStorage.clear();
       navigate('/login');

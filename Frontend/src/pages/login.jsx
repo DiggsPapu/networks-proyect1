@@ -1,55 +1,43 @@
-import * as React from 'react'
-import { useNavigate } from "react-router-dom"
-import Avatar from '@mui/material/Avatar'
-import Button from '@mui/material/Button'
-import CssBaseline from '@mui/material/CssBaseline'
-import TextField from '@mui/material/TextField'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import Checkbox from '@mui/material/Checkbox'
-import Link from '@mui/material/Link'
-import Grid from '@mui/material/Grid'
-import Box from '@mui/material/Box'
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
-import Typography from '@mui/material/Typography'
-import Container from '@mui/material/Container'
-import { createTheme, ThemeProvider } from '@mui/material/styles'
-import { get_contacts, get_friend_requests, login } from '../services/auth-service'
+import React from 'react';
+import { useNavigate } from "react-router-dom";
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import CssBaseline from '@mui/material/CssBaseline';
+import TextField from '@mui/material/TextField';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
+import Link from '@mui/material/Link';
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import Typography from '@mui/material/Typography';
+import Container from '@mui/material/Container';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { login } from '../services/services';
 
-function Copyright(props) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
-
-// TODO remove, this demo shouldn't need to reset the theme.
-
-const defaultTheme = createTheme()
+const defaultTheme = createTheme();
 
 export default function Login() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    let username = data.get('username')
-    let password = data.get('password')
-    const success = await login(username,password)
+    const username = data.get('username');
+    const password = data.get('password');
+    const success = await login(username, password);
+
     if (success) {
-      // Initialize the access & refresh token in localstorage.      
-      localStorage.clear()
-      localStorage.setItem('username', username)
-      localStorage.setItem('password', password)
-      await get_contacts()
-      await get_friend_requests()
-      navigate('/chat')
+      localStorage.clear();
+      localStorage.setItem("requests", []);
+      localStorage.setItem("contacts", []);
+      localStorage.setItem("messages", []);
+      localStorage.setItem('username', username);
+      localStorage.setItem('password', password);
+      await login(username, password); // Log in using XMPP
+      navigate('/chat');
     }
-  }
+  };
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -75,7 +63,7 @@ export default function Login() {
               required
               fullWidth
               id="username"
-              label="username"
+              label="Username"
               name="username"
               autoComplete="username"
               autoFocus
@@ -116,7 +104,6 @@ export default function Login() {
             </Grid>
           </Box>
         </Box>
-        <Copyright sx={{ mt: 8, mb: 4 }} />
       </Container>
     </ThemeProvider>
   );

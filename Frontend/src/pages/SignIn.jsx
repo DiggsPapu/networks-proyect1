@@ -12,7 +12,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import Typography from '@mui/material/Typography'
 import Container from '@mui/material/Container'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
-import { register } from '../services/auth-service'
+import { signUp } from '../services/services'
 import { useNavigate } from "react-router-dom"
 
 function Copyright(props) {
@@ -39,7 +39,7 @@ export default function SignIn() {
     const data = new FormData(form); // Pass the form element to FormData
     let username = data.get('username');
     let password = data.get('password');
-    const success = await register(username, password);
+    const success = await signUp(username, password);
     if (success) {
       // Initialize the access & refresh token in localstorage.      
       localStorage.clear();
