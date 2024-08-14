@@ -95,8 +95,8 @@ export async function login(username, password) {
                             const name = item.attrs.name || jid.split("@")[0];
                             const subscription = item.attrs.subscription;
                             console.log(`name: ${name} subscription: ${subscription}`)
-                            if (subscription === "from"){
-                                console.log("from")
+                            if (subscription === "from"||subscription === "none"){
+                                console.log("from|none")
                                 friendrequest.push(jid);
                                 localStorage.setItem("requests", JSON.stringify(friendrequest))
                             } else if (subscription === "to"){
@@ -249,17 +249,37 @@ export async function getContacts() {
     return 200;
 }
 export async function addContact(contact) {
-    if (xmpp){
-        xmpp.on('online', () => {
-            xmpp.send(xml('presence', { to: `${contact}@${domain}`, type: 'subscribe' }));
-          })
-        
-        console.log(`Request sent to ${contact}.`)
-        return 201;
+    if (xmpp) {
+        try {
+            // Enviar solicitud de suscripción
+            const presenceSubscription = xml('presence', {
+                to: `${contact}@${domain}`,
+                type: 'subscribe'
+            });
+            await xmpp.send(presenceSubscription);
+            console.log(`Subscription request sent to ${contact}`);
+
+            // Enviar solicitud para agregar al roster
+            const rosterAdd = xml('iq', {
+                type: 'set',
+                to: `${domain}`,
+                id: 'roster_add'
+            }, xml('query', { xmlns: 'jabber:iq:roster' },
+                xml('item', { jid: `${contact}@${domain}`, subscription: 'both' })
+            ));
+            
+            await xmpp.send(rosterAdd);
+            console.log(`Contact ${contact} added to roster.`);
+            return 201;
+        } catch (error) {
+            console.error("Error adding contact:", error);
+            return 500;
+        }
     }
-    console.error("UNAUTHORIZED, must be logged in")
+    console.error("UNAUTHORIZED, must be logged in");
     return 401;
 }
+
 export async function acceptFriendRequest(contact) {
     if (xmpp){
         // Subscribe to the user's presence
