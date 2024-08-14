@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import ContactBar from '../components/ContactBar';
 import Header from '../components/Header';
 import ChatInstance from '../components/ChatInstance';
+import { useClient } from '../context/xmppContext';
 
 const heightToggled = `
     height: 0%;
@@ -56,7 +57,8 @@ export const ChatBody = styled.div`
 
 
 const Chat = () => {
-  const navigate = useNavigate();
+  const client = useClient()
+  const navigate = useNavigate()
   const [name] = useState(localStorage.getItem("username"))
   const [toggleChat, setToggleChat] = useState(false)
   const [isFormVisible, setIsFormVisible] = useState(false)
