@@ -52,8 +52,8 @@ export class xmppService {
     this.sendPresence(show, statusMessage);
   }
 
-  sendMessage(to, body) {
-    const message = $msg({ to, type: "chat" }).c("body").t(body);
+  sendMessage(jid, msg) {
+    const message = $msg({ to:jid, type: "chat" }).c("body").t(msg);
     this.connection.send(message.tree());
   }
 
