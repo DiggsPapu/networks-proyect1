@@ -1,4 +1,3 @@
-import * as React from 'react'
 import Avatar from '@mui/material/Avatar'
 import Button from '@mui/material/Button'
 import CssBaseline from '@mui/material/CssBaseline'
@@ -13,6 +12,8 @@ import Typography from '@mui/material/Typography'
 import Container from '@mui/material/Container'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import { useNavigate } from "react-router-dom"
+import { useClient } from '../context/xmppContext'
+import React, { useState } from 'react'
 
 function Copyright(props) {
   return (
@@ -24,24 +25,28 @@ function Copyright(props) {
       {new Date().getFullYear()}
       {'.'}
     </Typography>
-  );
+  )
 }
 
 // TODO remove, this demo shouldn't need to reset the theme.
 
 const defaultTheme = createTheme()
-export default function SignIn() {
+export default function SignUp() {
   const navigate = useNavigate()
+  const client = useClient()
+  const [success, setSuccess] = useState(false)
   const handleSubmit = async (event) => {
-    event.preventDefault();
-    const form = event.currentTarget; // Get the form element
-    const data = new FormData(form); // Pass the form element to FormData
-    let username = data.get('username');
-    let password = data.get('password');
-    // const success = await signUp(username, password);
-    // if (success) {
-    //   navigate('/login');
-    // }
+    event.preventDefault()
+    const form = event.currentTarget
+    const data = new FormData(form)
+    let username = data.get('username')
+    let password = data.get('password')
+    client.signUp(username, password, () => {
+      setSuccess(true);
+    })
+  }
+  if (success) {
+    navigate('/login');
   }
 
   return (

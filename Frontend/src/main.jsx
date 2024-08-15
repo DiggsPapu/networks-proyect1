@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client'
 import './index.css'
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import Login from './pages/login.jsx'
-import SignIn from './pages/SignIn.jsx'
+import SignUp from './pages/SignUp.jsx'
 import Chat from './pages/Chat.jsx'
 import { XMPPProvider } from './context/xmppContext.jsx'
 const router = createBrowserRouter([
@@ -15,10 +15,10 @@ const router = createBrowserRouter([
     path: "/login",
     element: (<Login/>),
   },
-  // {
-  //   path: "/signIn",
-  //   element: (<SignIn/>),
-  // },
+  {
+    path: "/signUp",
+    element: (<SignUp/>),
+  },
 ]);
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

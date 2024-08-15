@@ -58,7 +58,7 @@ export class xmppService {
     this.connection.send(message.tree());
   }
 
-  signup(username, fullName, email, password, onSuccess, onError) {
+  signUp(username, password, onSuccess, onError) {
     this.connection.connect("alo20172@alumchat.lol", "Manager123", (status) => {
       if (status === Strophe.Status.CONNECTED) {
         console.log("Connected to XMPP server");
@@ -67,8 +67,6 @@ export class xmppService {
           .c("query", { xmlns: "jabber:iq:register" })
           .c("username").t(username).up()
           .c("password").t(password).up()
-          .c("fullname").t(fullName).up()
-          .c("email").t(email);
 
         this.connection.sendIQ(registerIQ, (iq) => {
           console.log("Registration successful", iq);
