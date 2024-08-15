@@ -15,10 +15,10 @@ const router = createBrowserRouter([
     path: "/login",
     element: (<Login/>),
   },
-  {
-    path: "/signIn",
-    element: (<SignIn/>),
-  },
+  // {
+  //   path: "/signIn",
+  //   element: (<SignIn/>),
+  // },
 ]);
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

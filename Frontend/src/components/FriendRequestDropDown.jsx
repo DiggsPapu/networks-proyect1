@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { acceptFriendRequest, getContacts } from "../services/services"
-import styled from 'styled-components';
+// import { acceptFriendRequest, getContacts } from "../services/services"
+import { useClient } from '../context/xmppContext'
+import styled from 'styled-components'
 
 // Styled components for dropdown
 const DropdownContainer = styled.div`
@@ -60,18 +61,19 @@ const DropdownItem = styled.li`
 export default function FriendRequestDropDown({setContacts, contacts}) {
     const [friendList, setFriendList] = useState(JSON.parse(localStorage.getItem("requests") || "[]"));
     const [open, setOpen] = useState(false)
+    const client = useClient()
 
     const friendRequestAccepted = async (friendRequest) => {
-        await acceptFriendRequest(friendRequest)
-        setFriendList(friendList.filter((name) => name !== friendRequest))
+        // await acceptFriendRequest(friendRequest)
+        // setFriendList(friendList.filter((name) => name !== friendRequest))
         // await getContacts(JSON.parse(localStorage.getItem("contacts") || "[]"))
         // setContacts()
     };
 
     const friendRequestRejected = async (friendRequest) => {
         // Handle the rejection logic here (if any)
-        setFriendList(friendList.filter((name) => name !== friendRequest))
-        await get_contacts()
+        // setFriendList(friendList.filter((name) => name !== friendRequest))
+        // await get_contacts()
     }
 
     return (

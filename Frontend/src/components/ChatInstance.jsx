@@ -3,7 +3,9 @@ import ChatHead from '../components/ChatHead';
 import Message from '../components/Message';
 import ChatFooter from '../components/ChatFooter';
 import styled from 'styled-components';
-import { sendMessage } from "../services/services"
+import { useClient } from '../context/xmppContext';
+// import { sendMessage } from "../services/services"
+
 
 const heightToggled = `
     height: 0%;
@@ -68,6 +70,7 @@ export default function ChatInstance({ contact, type="user" }) {
     const [toggleChat, setToggleChat] = useState(false);
     const [messagesId, setMessagesId] = useState([]);
     const [messageChanges, setMessageChanges] = useState(localStorage.getItem("messages"));
+    const client = useClient()
     useEffect(()=>{
         let mes = JSON.parse(localStorage.getItem("messages"));
             console.log(mes)

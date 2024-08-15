@@ -1,38 +1,40 @@
 import React, { useState } from "react"
 import FriendRequestDropDown from '../components/FriendRequestDropDown'
 import { useNavigate } from 'react-router-dom'
-import { addContact, deleteAccount, getContacts, logout } from '../services/services'
+import { useClient } from "../context/xmppContext";
+// import { addContact, deleteAccount, getContacts, logout } from '../services/services'
 
 export default function Header({contacts, setContacts, friendRequests, setFriendRequests}){
     const navigate = useNavigate();
     const [toggleChat, setToggleChat] = useState(false);
     const [isFormVisible, setIsFormVisible] = useState(false);
+    const client = useClient()
     const add_contact = async (event) => {
         event.preventDefault();
         const form = event.currentTarget; // Get the form element
         const data = new FormData(form); // Pass the form element to FormData
         let username = data.get('contactUsername');
-        const success = await addContact(username);
-        if (success) {
-            await getContacts();
-            setIsFormVisible(false);
-        }
+        // const success = await addContact(username);
+        // if (success) {
+        //     // await getContacts();
+        //     setIsFormVisible(false);
+        // }
     };
 
     const logout_ = async () => {
-        const success = await logout();
-        if (success) {
-        localStorage.clear();
-        navigate('/login');
-        }
+        // const success = await logout();
+        // if (success) {
+        // localStorage.clear();
+        // navigate('/login');
+        // }
     };
 
     const delete_account = async () => {
-        const success = await deleteAccount();
-        if (success) {
-        localStorage.clear();
-        navigate('/login');
-        }
+        // const success = await deleteAccount();
+        // if (success) {
+        // localStorage.clear();
+        // navigate('/login');
+        // }
     };
 
     const toggleFormVisibility = () => {

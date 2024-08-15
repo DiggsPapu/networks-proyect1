@@ -1,4 +1,4 @@
-import React, { createContext, useRef } from "react"
+import React, { createContext, useRef, useContext } from "react"
 import { xmppService } from "../services/services"
 
 export const XMPPContext = createContext(null);

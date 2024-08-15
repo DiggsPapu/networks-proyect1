@@ -59,7 +59,7 @@ export class xmppService {
   }
 
   signup(username, fullName, email, password, onSuccess, onError) {
-    this.connection.connect("car_21108@alumchat.lol", "prueba2024", (status) => {
+    this.connection.connect("alo20172@alumchat.lol", "Manager123", (status) => {
       if (status === Strophe.Status.CONNECTED) {
         console.log("Connected to XMPP server");
 
@@ -113,16 +113,16 @@ export class xmppService {
 
     if (this.jid !== from) {
       switch (type) {
-        case XMPPClient.PRESENCE_TYPES.SUBSCRIBE:
+        case xmppService.PRESENCE_TYPES.SUBSCRIBE:
           this.handleSubscriptionRequest(from);
           break;
-        case XMPPClient.PRESENCE_TYPES.SUBSCRIBED:
+        case xmppService.PRESENCE_TYPES.SUBSCRIBED:
           console.log(`${from} accepted your subscription request`);
           break;
-        case XMPPClient.PRESENCE_TYPES.UNSUBSCRIBED:
+        case xmppService.PRESENCE_TYPES.UNSUBSCRIBED:
           delete this.roster[from];
           break;
-        case XMPPClient.PRESENCE_TYPES.UNAVAILABLE:
+        case xmppService.PRESENCE_TYPES.UNAVAILABLE:
           this.roster[from] = { jid: from, status: "offline", statusMessage: "" };
           break;
         default:

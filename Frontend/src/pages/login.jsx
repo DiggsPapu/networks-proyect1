@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -13,31 +13,29 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { login } from '../services/services';
+import { useClient } from '../context/xmppContext';
 
 const defaultTheme = createTheme();
 
 export default function Login() {
+  const client = useClient();
   const navigate = useNavigate();
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const username = data.get('username');
     const password = data.get('password');
-    const success = await login(username, password);
 
-    if (success) {
-      localStorage.clear();
-      localStorage.setItem("requests", []);
-      localStorage.setItem("contacts", []);
-      localStorage.setItem("messages", []);
-      localStorage.setItem('username', username);
-      localStorage.setItem('password', password);
-      await login(username, password); // Log in using XMPP
-      navigate('/chat');
-    }
+    client.connect(username, password, () => {
+      setSuccess(true);
+    });
   };
+
+  if (success) {
+    navigate('/chat');
+  }
 
   return (
     <ThemeProvider theme={defaultTheme}>

@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';import { useNavigate } from 'react-router-dom';
-import { addContact, deleteAccount, logout } from '../services/services';
+// import { addContact, deleteAccount, logout } from '../services/services';
 import styled from 'styled-components';
 import ContactBar from '../components/ContactBar';
 import Header from '../components/Header';
@@ -71,11 +71,11 @@ const Chat = () => {
     const form = event.currentTarget
     const data = new FormData(form)
     const username = data.get('contactUsername')
-    const success = await addContact(username)
-    if (success) {
-      setIsFormVisible(false)
-    }
-  };
+    // const success = await addContact(username)
+    // if (success) {
+    //   setIsFormVisible(false)
+    // }
+  }
 
   const onSubmitMessage = (msg) => {
     setMessages((prevMessages) => [
@@ -89,19 +89,19 @@ const Chat = () => {
   };
 
   const logout = async () => {
-    const success = await logout();
-    if (success) {
-      localStorage.clear();
-      navigate('/login');
-    }
+    // const success = await logout();
+    // if (success) {
+    //   localStorage.clear();
+    //   navigate('/login');
+    // }
   };
 
   const deleteAccount = async () => {
-    const success = await deleteAccount()
-    if (success) {
-      localStorage.clear();
-      navigate('/login');
-    }
+    // const success = await deleteAccount()
+    // if (success) {
+    //   localStorage.clear();
+    //   navigate('/login');
+    // }
   };
 
   const toggleFormVisibility = () => {
