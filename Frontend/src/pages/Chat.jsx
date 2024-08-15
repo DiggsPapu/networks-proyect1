@@ -65,7 +65,7 @@ const Chat = () => {
   const [currentChat, setCurrentChat] = useState(null)
   const [contacts, setContacts] = useState(JSON.parse(localStorage.getItem("contacts") || "[]"))
   const [friendRequests, setFriendRequests] = useState(JSON.parse(localStorage.getItem("requests"))||"[]")
-
+  
   const addContact = async (event) => {
     event.preventDefault();
     const form = event.currentTarget
@@ -86,15 +86,7 @@ const Chat = () => {
 
   const handleToggle = () => {
     setToggleChat(!toggleChat)
-  };
-
-  const logout = async () => {
-    // const success = await logout();
-    // if (success) {
-    //   localStorage.clear();
-    //   navigate('/login');
-    // }
-  };
+  }
 
   const deleteAccount = async () => {
     // const success = await deleteAccount()

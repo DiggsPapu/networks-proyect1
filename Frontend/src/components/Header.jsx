@@ -5,10 +5,15 @@ import { useClient } from "../context/xmppContext";
 // import { addContact, deleteAccount, getContacts, logout } from '../services/services'
 
 export default function Header({contacts, setContacts, friendRequests, setFriendRequests}){
-    const navigate = useNavigate();
-    const [toggleChat, setToggleChat] = useState(false);
-    const [isFormVisible, setIsFormVisible] = useState(false);
+    const navigate = useNavigate()
+    const [toggleChat, setToggleChat] = useState(false)
+    const [isFormVisible, setIsFormVisible] = useState(false)
+    const [loggedOut, setLoggedOut] = useState(false)
     const client = useClient()
+
+    if (loggedOut) {
+        navigate('/login')
+    }
     const add_contact = async (event) => {
         event.preventDefault();
         const form = event.currentTarget; // Get the form element
@@ -22,12 +27,9 @@ export default function Header({contacts, setContacts, friendRequests, setFriend
     };
 
     const logout_ = async () => {
-        // const success = await logout();
-        // if (success) {
-        // localStorage.clear();
-        // navigate('/login');
-        // }
-    };
+        await client.logOut()
+        setLoggedOut(true)
+    }
 
     const delete_account = async () => {
         // const success = await deleteAccount();

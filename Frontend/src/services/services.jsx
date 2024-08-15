@@ -23,7 +23,6 @@ export class xmppService {
   }
 
   connect(jid, password, onConnect) {
-    // Ensure handlers are set up correctly before connection is established
     this.connection.addHandler(this.handlePresence.bind(this), null, "presence");
 
     this.connection.connect(jid, password, (status) => {
@@ -164,11 +163,10 @@ export class xmppService {
     this.statusMessage = "Available";
   }
 
-  disconnect() {
-    this.sendPresence("offline", "Disconnected");
-    this.connection.disconnect();
-    this.cleanClientValues();
-    console.log("Disconnected from XMPP server");
+  logOut() {
+    this.sendPresence("offline", "Disconnected")
+    this.connection.disconnect()
+    this.cleanClientValues()
   }
 
   setOnRosterReceived(callback) {
