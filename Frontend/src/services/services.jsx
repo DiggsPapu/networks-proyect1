@@ -208,18 +208,19 @@ export class xmppService {
     this.connection.send(presenceSubscribe.tree());
     console.log(`Subscription request sent to ${jid}`);
   }
-
-  addContact(jid) {
+  
+  addContact(contact) {
     const addContactIQ = $iq({ type: "set" })
       .c("query", { xmlns: "jabber:iq:roster" })
-      .c("item", { jid });
-
+      .c("item", { jid: contact }); // Use jid instead of contact
+  
     this.connection.sendIQ(addContactIQ, (iq) => {
-      console.log(`Contact ${jid} added successfully`, iq);
+      console.log(`Contact ${contact} added successfully`, iq);
     }, (error) => {
-      console.error(`Failed to add contact ${jid}`, error);
+      console.error(`Failed to add contact ${contact}`, error);
     });
   }
+  
 
   acceptSubscription(from) {
     console.log(`Accepting subscription request from ${from}`);

@@ -67,10 +67,10 @@ const Chat = () => {
   
   return (
     <div style={{ display: 'flex', flexDirection: 'column'}}>
-      {/* <Header 
+      <Header 
       contacts={contacts} setContacts={(contacts)=>{setContacts(contacts)}}
-      friendRequests={friendRequests} setFriendRequests={(requests)=>{setContacts(requests)}}
-      /> */}
+      // friendRequests={friendRequests} setFriendRequests={(requests)=>{setContacts(requests)}}
+      />
       <ContactBar setContact={(contact) => {
         setCurrentChat(contact)
       }} 

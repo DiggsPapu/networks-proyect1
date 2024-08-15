@@ -49,14 +49,9 @@ export const ChatBody = styled.div`
     ${props => props.toggle ? heightToggled : height}
 `
 export default function ChatInstance({ contact, type="user" }) {
-    const [messages, setMessages] = useState([]);
-    const [toggleChat, setToggleChat] = useState(false);
-    const [messagesId, setMessagesId] = useState([]);
-    const [messageChanges, setMessageChanges] = useState(localStorage.getItem("messages"));
+    const [messages, setMessages] = useState([])
+    const [toggleChat, setToggleChat] = useState(false)
     const client = useClient()
-    useEffect(()=>{
-        console.log(contact)
-    },[])
     const onSubmitMessage = async (msg) => {
         client.sendMessage(contact.jid, msg)
         setMessages([...messages, {userId:1, message: msg}])

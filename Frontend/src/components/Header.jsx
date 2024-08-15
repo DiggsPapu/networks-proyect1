@@ -1,12 +1,11 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import FriendRequestDropDown from '../components/FriendRequestDropDown'
 import { useNavigate } from 'react-router-dom'
 import { useClient } from "../context/xmppContext";
 // import { addContact, deleteAccount, getContacts, logout } from '../services/services'
 
-export default function Header({contacts, setContacts, friendRequests, setFriendRequests}){
+export default function Header({contacts, setContacts}){
     const navigate = useNavigate()
-    const [toggleChat, setToggleChat] = useState(false)
     const [isFormVisible, setIsFormVisible] = useState(false)
     const [loggedOut, setLoggedOut] = useState(false)
     const client = useClient()
@@ -14,16 +13,17 @@ export default function Header({contacts, setContacts, friendRequests, setFriend
     if (loggedOut) {
         navigate('/login')
     }
+    useEffect(()=>{
+        
+    })
     const add_contact = async (event) => {
-        event.preventDefault();
-        const form = event.currentTarget; // Get the form element
-        const data = new FormData(form); // Pass the form element to FormData
-        let username = data.get('contactUsername');
-        // const success = await addContact(username);
-        // if (success) {
-        //     // await getContacts();
-        //     setIsFormVisible(false);
-        // }
+        event.preventDefault()
+        const form = event.currentTarget
+        const data = new FormData(form)
+        let username = data.get('contactUsername')
+        console.log(username)
+        client.sendSubscriptionRequest(`${username}@alumchat.lol`)
+        toggleFormVisibility()
     };
 
     const logout_ = async () => {
