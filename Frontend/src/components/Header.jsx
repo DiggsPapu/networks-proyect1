@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react"
 import FriendRequestDropDown from '../components/FriendRequestDropDown'
 import { useNavigate } from 'react-router-dom'
-import { useClient } from "../context/xmppContext";
-// import { addContact, deleteAccount, getContacts, logout } from '../services/services'
+import { useClient } from "../context/xmppContext"
 
 export default function Header({contacts, setContacts}){
     const navigate = useNavigate()

@@ -13,21 +13,6 @@ services:
     volumes:
       - './Frontend:/app'
       - './Frontend/node_modules:/app/node_modules'
-    depends_on:
-      - client
-    networks:
-      - networks-p1
-  client:
-    build:
-      context: ./Backend
-      dockerfile: Dockerfile
-    environment:
-      NODE_ENV: production
-    ports:
-    - 6363:6363
-    volumes:
-      - './Backend:/client'
-      - './Backend/node_modules:/client/node_modules'
     networks:
       - networks-p1
 networks:
