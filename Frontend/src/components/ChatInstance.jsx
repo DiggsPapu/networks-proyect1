@@ -72,18 +72,8 @@ export default function ChatInstance({ contact, type="user" }) {
     const [messageChanges, setMessageChanges] = useState(localStorage.getItem("messages"));
     const client = useClient()
     useEffect(()=>{
-        let mes = JSON.parse(localStorage.getItem("messages"));
-            console.log(mes)
-            mes.map((message)=>{
-                if(message.from.split("@")[0]===contact.name && !messagesId.includes(message.id)){
-                    setMessagesId([...messagesId, message.id]);
-                    setMessages((prevMessages) => [
-                        ...prevMessages,
-                        { userId: 2, message: message.body }
-                    ]);
-                }
-            })
-    },[localStorage.getItem("messages")])
+        console.log(contact)
+    },[])
     const onSubmitMessage = async (msg) => {
         console.log(contact)
         if(await sendMessage(contact.name, msg, type).then(setTimeout(5000))){
@@ -112,10 +102,11 @@ export default function ChatInstance({ contact, type="user" }) {
     return (
         <ChatContainer toggle={toggleChat}>
             <ChatHead 
-                name={contact.name} 
+                name={contact.jid} 
                 toggle={toggleChat}
                 onClick={handleToggle}
-                presence={contact.presence}
+                presence={contact.status}
+                presenceMessage={contact.statusMessage}
             />
             <ChatBody toggle={toggleChat}>
                 <Message messages={messages} />

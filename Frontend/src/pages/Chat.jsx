@@ -1,10 +1,10 @@
-import React, { useRef, useState } from 'react';import { useNavigate } from 'react-router-dom';
-// import { addContact, deleteAccount, logout } from '../services/services';
-import styled from 'styled-components';
-import ContactBar from '../components/ContactBar';
-import Header from '../components/Header';
-import ChatInstance from '../components/ChatInstance';
-import { useClient } from '../context/xmppContext';
+import React, { useRef, useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import styled from 'styled-components'
+import ContactBar from '../components/ContactBar'
+import Header from '../components/Header'
+import ChatInstance from '../components/ChatInstance'
+import { useClient } from '../context/xmppContext'
 
 const heightToggled = `
     height: 0%;
@@ -58,54 +58,19 @@ export const ChatBody = styled.div`
 
 const Chat = () => {
   const client = useClient()
-  const navigate = useNavigate()
-  const [name] = useState(localStorage.getItem("username"))
-  const [toggleChat, setToggleChat] = useState(false)
-  const [isFormVisible, setIsFormVisible] = useState(false)
+  const [contacts, setContacts] = useState({})
   const [currentChat, setCurrentChat] = useState(null)
-  const [contacts, setContacts] = useState(JSON.parse(localStorage.getItem("contacts") || "[]"))
-  const [friendRequests, setFriendRequests] = useState(JSON.parse(localStorage.getItem("requests"))||"[]")
+  useEffect(() => {
+    client.setOnRosterReceived(setContacts)
+    client.fetchRoster()
+  }, [client])
   
-  const addContact = async (event) => {
-    event.preventDefault();
-    const form = event.currentTarget
-    const data = new FormData(form)
-    const username = data.get('contactUsername')
-    // const success = await addContact(username)
-    // if (success) {
-    //   setIsFormVisible(false)
-    // }
-  }
-
-  const onSubmitMessage = (msg) => {
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      { userId: 1, message: msg }
-    ]);
-  };
-
-  const handleToggle = () => {
-    setToggleChat(!toggleChat)
-  }
-
-  const deleteAccount = async () => {
-    // const success = await deleteAccount()
-    // if (success) {
-    //   localStorage.clear();
-    //   navigate('/login');
-    // }
-  };
-
-  const toggleFormVisibility = () => {
-    setIsFormVisible(!isFormVisible)
-  };
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column'}}>
-      <Header 
+      {/* <Header 
       contacts={contacts} setContacts={(contacts)=>{setContacts(contacts)}}
       friendRequests={friendRequests} setFriendRequests={(requests)=>{setContacts(requests)}}
-      />
+      /> */}
       <ContactBar setContact={(contact) => {
         setCurrentChat(contact)
       }} 

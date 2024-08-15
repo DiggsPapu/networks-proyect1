@@ -6,20 +6,27 @@ export default function ContactBar({setContact, contacts}) {
         <div style={{
             width: '30%',
             backgroundColor: 'grey',
-            height: 'calc(100% - 60px)', // Adjust height to account for the header
+            height: 'calc(100% - 60px)',
             position: 'fixed',
-            top: '60px', // Start right after the header
+            top: '60px',
             left: '0',
         }}>
             <ul>
-                {
-                    contacts && contacts.length > 0 ?
-                    contacts.map((contact, index) => (
-                        <button key={index} style={{marginTop:"10%"}} onClick={()=>{setContact(contacts[index])}}>{contact.jid}</button>
-                        )
-                    )
-                    : <>No Contacts</>
-                }
+            {Object.keys(contacts).length === 0 ? (
+                <p>No contacts added</p>
+            ) : (
+            <>
+                {Object.entries(contacts).map(([jid, contact]) => (
+                <button onClick={()=>{
+                    setContact(contact)}
+                    }>
+                    contact:{contact.jid}<br/>
+                    status:{contact.status}<br/>
+                    status message:{contact.statusMessage || "No status message"}<br/>
+                </button>
+                ))}
+            </>
+            )}
             </ul>
         </div>
     );

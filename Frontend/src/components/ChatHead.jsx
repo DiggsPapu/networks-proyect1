@@ -32,18 +32,24 @@ export const Head = styled.div`
         font-size: 28px;
         font-weight: bold;
     }
-
-    span:nth-child(2) {
+    .coso {
+        display: flex;
+        flex-direction: column;
+    }
+    .coso span{
         font-size: 10px;
         color: lightgreen;
     }
 `;
 
-const ChatHead = ({ name, toggle, onClick, presence }) => (
+const ChatHead = ({ name, toggle, onClick, presence, presenceMessage }) => (
     <Head toggle={toggle}>
         <div>
-            <span>{name}&nbsp;</span>
-            <span>{presence}</span>
+            <span>{name}</span>
+            <div className="coso">
+                <span>{presence}</span>
+                <span>{presenceMessage}</span>
+            </div>
         </div>
         <div>
             <FaBars onClick={onClick} />
