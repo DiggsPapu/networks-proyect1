@@ -123,8 +123,9 @@ export class xmppService {
       const items = iq.getElementsByTagName("item")
       for (let i = 0; i < items.length; i++) {
         const jid = items[i].getAttribute("jid")
-        if (items[i].getAttribute("subscription") === "both") {
-          contacts[jid] = { jid, status: "online", statusMessage: "Available" }
+        if (items[i].getAttribute("subscription") === "both" || items[i].getAttribute("ask") === "subscription" ) {
+          contacts[jid] = this.roster[jid] || { jid, status: "offline", statusMessage: "" }
+          this.connection.send($pres({ type: "probe", to: jid }))
         }
       }
       this.roster = contacts
