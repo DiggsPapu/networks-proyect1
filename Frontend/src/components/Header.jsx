@@ -22,13 +22,13 @@ export default function Header({contacts, setContacts}){
         toggleFormVisibility()
     };
 
-    const logout_ = async () => {
-        await client.logOut()
+    const salir_ = async () => {
+        await client.salir()
         setLoggedOut(true)
     }
 
     const delete_account = async () => {
-        // const success = await deleteAccount();
+        // const success = await borrarCuenta();
         // if (success) {
         // localStorage.clear();
         // navigate('/login');
@@ -54,12 +54,12 @@ export default function Header({contacts, setContacts}){
         }}>
             
             <button style={{position:'fixed', top:'0', left:'0'}}>{localStorage.getItem("username")}</button>
-            <button type='button' onClick={logout_}>Log out</button>
+            <button type='button' onClick={salir_}>Log out</button>
             <button type='button' onClick={delete_account}>Delete Account</button>
             <button type='button' onClick={()=>{navigate("/profile")}}>Change Profile</button>
             <>
                 <button onClick={toggleFormVisibility}>
-                AddContact
+                aniadirContacto
                 </button>
                 {isFormVisible && (
                 <form onSubmit={add_contact}>

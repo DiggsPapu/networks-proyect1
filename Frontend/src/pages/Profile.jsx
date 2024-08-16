@@ -8,7 +8,7 @@ export default function Profile(){
     const [status, setStatus] = useState(client.status)
     const [statusMessage, setStatusMessage] = useState(client.statusMessage)
     const handleChange = ()=>{
-        client.updateStatus(status, statusMessage)
+        client.actualizarEstado(status, statusMessage)
         navigate('/chat')
     }
     return (

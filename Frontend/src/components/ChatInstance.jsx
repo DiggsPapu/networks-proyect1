@@ -55,26 +55,19 @@ export default function ChatInstance({ contact, type = "user" }) {
     const client = useClient();
 
     const onSubmitMessage = async (msg) => {
-        client.setOnMessageReceived(updateMessages)
-        client.sendMessage(contact.jid, msg)
+        client.setMensajeRecibido(updateMessages)
+        client.enviarMensaje(contact.jid, msg)
         setMessages(prevMessages => {
-            let newMessages = [...prevMessages, { userId: 1, from:client.jid, to:contact.jid, message: msg, time: Date.now()}]
+            const date = Date.now()
+            let newMessages = [...prevMessages, { userId: 1, from:client.jid, to:contact.jid, message: msg, time: date}]
+            client.messagesReceived.push({ userId: 1, from:client.jid, to:contact.jid, message: msg, time: date})
             return newMessages.filter((message)=>(message.from===contact.jid)||(message.from === client.jid && message.to === contact.jid))
         })
     }
-
-    // const updateMessages = (to, from, message, timestamp) => {
-    //     if (from === contact.jid && messages.filter((message)=>message.timestamp==timestamp && message.from === from).length===0){
-    //         setMessages(prevMessages => [...prevMessages, {userId:0, from: from, to:client.jid, message: message, time: timestamp}])
-    //     }
-    //     console.log(messages)
-    //     // setMessages(messages.filter((message)=>{(message.from === client.jid && message.to === contact.jid) || (message.from === contact.jid && message.to === client.jid)}))
-    //     // console.log(messages.filter((message)=>{console.log(`to: ${message.to} from: ${message.from} message: ${message.message}`)}))
-    // }
     const updateMessages = (to, from, message, timestamp) => {
         if (from === contact.jid && messages.filter((message)=>message.timestamp==timestamp && message.from === from).length===0) {
             setMessages(prevMessages => {
-                const newMessages = [...prevMessages, { userId: 0, from: from, to: client.jid, message: message, time: timestamp }];
+                const newMessages = [...prevMessages, { userId: 0, from: from, to: client.jid, message: message, time: timestamp }]
                 return newMessages.filter((message)=>(message.from===contact.jid)||(message.from === client.jid && message.to === contact.jid))
             })
         }
@@ -84,7 +77,10 @@ export default function ChatInstance({ contact, type = "user" }) {
         setToggleChat(!toggleChat)
     }
     useEffect(() => {
-        client.setOnMessageReceived(updateMessages)
+        setMessages(client.messagesReceived.filter((message)=>(message.from===contact.jid)||(message.from === client.jid && message.to === contact.jid)))
+    }, [contact.jid])
+    useEffect(() => {
+        client.setMensajeRecibido(updateMessages)
       }, [client])
 
     return (

@@ -20,8 +20,8 @@ export class xmppService {
     this.statusMessage = "Available"
     this.messagesReceived = []
     this.contactCurrentlyChatting = ""
-    this.onRosterReceived = () => {}
-    this.onSubscriptionReceived = () => {} 
+    this.rosterRecibido = () => {}
+    this.subscripcionRecibida = () => {} 
     this.onMessageReceived = () => {}
   }
 
@@ -40,67 +40,57 @@ export class xmppService {
     })
   }
 
-  updateStatus(show, statusMessage) {
+  actualizarEstado(show, statusMessage) {
     this.connection.send(show === "offline"? $pres({ type: "unavailable" }): $pres().c("show").t(show).up().c("status").t(statusMessage).tree())
     this.status = show
     this.statusMessage = statusMessage
   }
 
-  sendMessage(jid, msg) {
+  enviarMensaje(jid, msg) {
     const message = $msg({ to: jid, type: "chat" }).c("body").t(msg)
     this.connection.send(message.tree())
     console.log(this.contactCurrentlyChatting)
   }
 
   handleMessage(message) {
-    const from = message.getAttribute("from");
-    const to = message.getAttribute("to");
-    const forwarded = message.getElementsByTagName("forwarded")[0];
-    const fileElement = message.getElementsByTagName("file")[0];
-    const fileNameElement = message.getElementsByTagName("filename")[0];
-
-    let body;
-    let originalFrom;
-    let originalTo;
-    let timestamp;
-  
+    let body, originalFrom, originalTo, timestamp
+    const from = message.getAttribute("from")
+    const to = message.getAttribute("to")
+    const forwarded = message.getElementsByTagName("forwarded")[0]
+    const fileElement = message.getElementsByTagName("file")[0]
+    const fileNameElement = message.getElementsByTagName("filename")[0]
     if (forwarded) {
-      const forwardedMessage = forwarded.getElementsByTagName("message")[0];
-      originalFrom = forwardedMessage.getAttribute("from");
-      originalTo = forwardedMessage.getAttribute("to");
-      body = forwardedMessage.getElementsByTagName("body")[0]?.textContent;
+      const forwardedMessage = forwarded.getElementsByTagName("message")[0]
+      originalFrom = forwardedMessage.getAttribute("from")
+      originalTo = forwardedMessage.getAttribute("to")
+      body = forwardedMessage.getElementsByTagName("body")[0]?.textContent
   
-      const delay = forwarded.getElementsByTagName("delay")[0];
+      const delay = forwarded.getElementsByTagName("delay")[0]
       if (delay) {
-        timestamp = new Date(delay.getAttribute("stamp"));
+        timestamp = new Date(delay.getAttribute("stamp"))
       }
 
     } else {
-      originalFrom = from;
-      originalTo = to;
-      body = message.getElementsByTagName("body")[0]?.textContent;
-  
-      timestamp = new Date();
+      originalFrom = from
+      originalTo = to
+      body = message.getElementsByTagName("body")[0]?.textContent
+      timestamp = new Date()
     }
 
     if (fileElement && fileNameElement) {
-      const base64Data = fileElement.textContent;
-      const fileName = fileNameElement.textContent;
-      const fileUrl = `data:application/octet-stream;base64,${base64Data}`;
-      
-      this.onFileReceived(originalTo, Strophe.getBareJidFromJid(originalFrom), fileName, fileUrl, timestamp);
-      return true;
+      this.onFileReceived(ot, Strophe.getBareJidFromJid(f), fileNameElement.textContent, `data:application/octet-streambase64,${fileElement.textContent}`, ts)
+      return true
     }
   
     if (body) {
-      console.log(`Message received from ${Strophe.getBareJidFromJid(originalFrom)} at ${timestamp.toLocaleDateString()}: ${body}`);
-      this.onMessageReceived(originalTo, Strophe.getBareJidFromJid(originalFrom), body, timestamp); 
+      console.log(`Message received from ${Strophe.getBareJidFromJid(originalFrom)} at ${timestamp.toLocaleDateString()}: ${body}`)
+      this.messagesReceived.push({userId:0, from:Strophe.getBareJidFromJid(originalFrom), to:this.jid, message:body, time:timestamp })
+      this.onMessageReceived(originalTo, Strophe.getBareJidFromJid(originalFrom), body, timestamp) 
     }
-  
-    return true;
+    return true
   }  
 
-  setOnMessageReceived(callback) {
+  setMensajeRecibido(callback) {
     this.onMessageReceived = callback
   }
 
@@ -145,7 +135,7 @@ export class xmppService {
         }
       }
       this.roster = contacts
-      this.onRosterReceived({ ...this.roster })
+      this.rosterRecibido({ ...this.roster })
     })
   }
 
@@ -175,7 +165,7 @@ export class xmppService {
           const statusMessage = presence.getElementsByTagName("status")[0]?.textContent || "Available"
           this.roster[from] = { jid: from, status, statusMessage }
       }
-      this.onRosterReceived({ ...this.roster })
+      this.rosterRecibido({ ...this.roster })
     }
 
     return true
@@ -185,10 +175,10 @@ export class xmppService {
     if (!(from in this.roster)) {
       console.log(`Subscription request from ${from} received`)
       this.subscriptionQueue.push(from)
-      this.onSubscriptionReceived([...this.subscriptionQueue])
+      this.subscripcionRecibida([...this.subscriptionQueue])
     } else {
       console.log(`Subscription request from ${from} already accepted`)
-      this.acceptSubscription(from)
+      this.aceptarSubscripcion(from)
     }
   }
 
@@ -204,25 +194,25 @@ export class xmppService {
   cleanClientValues() {
     this.roster = {}
     this.subscriptionQueue = []
-    this.onRosterReceived = () => {}
-    this.onSubscriptionReceived = () => {}
+    this.rosterRecibido = () => {}
+    this.subscripcionRecibida = () => {}
     this.jid = ""
     this.status = "online"
     this.statusMessage = "Available"
   }
 
-  logOut() {
+  salir() {
     this.connection.send($pres({ type: "unavailable" }))
     this.connection.disconnect()
     this.cleanClientValues()
   }
 
-  setOnRosterReceived(callback) {
-    this.onRosterReceived = callback
+  setrosterRecibido(callback) {
+    this.rosterRecibido = callback
   }
 
-  setOnSubscriptionReceived(callback) {
-    this.onSubscriptionReceived = callback
+  setsubscripcionRecibida(callback) {
+    this.subscripcionRecibida = callback
   }
 
   getProfile(jid, onProfileReceived) {
@@ -238,7 +228,7 @@ export class xmppService {
     })
   }
 
-  deleteAccount(onSuccess) {
+  borrarCuenta(onSuccess) {
     const deleteIQ = $iq({ type: "set", to: this.domain })
       .c("query", { xmlns: "jabber:iq:register" })
       .c("remove")
@@ -257,19 +247,19 @@ export class xmppService {
     console.log(`Subscription request sent to ${jid}`)
   }
 
-  addContact(contact) {
-    const addContactIQ = $iq({ type: "set" })
+  aniadirContacto(contact) {
+    const aniadirContactoIQ = $iq({ type: "set" })
       .c("query", { xmlns: "jabber:iq:roster" })
       .c("item", { jid: contact })
   
-    this.connection.sendIQ(addContactIQ, (iq) => {
+    this.connection.sendIQ(aniadirContactoIQ, (iq) => {
       console.log(`Contact ${contact} added successfully`, iq)
     }, (error) => {
       console.error(`Failed to add contact ${contact}`, error)
     })
   }
 
-  acceptSubscription(from) {
+  aceptarSubscripcion(from) {
     console.log(`Accepting subscription request from ${from}`)
     const acceptPresence = $pres({ to: from, type: "subscribed" })
     this.connection.send(acceptPresence.tree())
@@ -280,15 +270,15 @@ export class xmppService {
     }
 
     this.subscriptionQueue = this.subscriptionQueue.filter(jid => jid !== from)
-    this.onSubscriptionReceived([...this.subscriptionQueue])
+    this.subscripcionRecibida([...this.subscriptionQueue])
   }
 
-  rejectSubscription(from) {
+  rechazarSubscripcion(from) {
     console.log(`Rejecting subscription request from ${from}`)
     const rejectPresence = $pres({ to: from, type: "unsubscribed" })
     this.connection.send(rejectPresence.tree())
     
     this.subscriptionQueue = this.subscriptionQueue.filter(jid => jid !== from)
-    this.onSubscriptionReceived([...this.subscriptionQueue])
+    this.subscripcionRecibida([...this.subscriptionQueue])
   }
 }

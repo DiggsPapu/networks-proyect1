@@ -61,7 +61,7 @@ const Chat = () => {
   const [contacts, setContacts] = useState({})
   const [currentChat, setCurrentChat] = useState(null)
   useEffect(() => {
-    client.setOnRosterReceived(setContacts)
+    client.setrosterRecibido(setContacts)
     client.fetchRoster()
   }, [client])
   
