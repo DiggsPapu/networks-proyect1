@@ -25,35 +25,25 @@ export class xmppService {
     this.onMessageReceived = () => {}
   }
 
-  connect(jid, password, onConnect) {
+  connect(jid, password, connect) {
     this.connection.addHandler(this.handlePresence.bind(this), null, "presence")
     this.connection.addHandler(this.handleMessage.bind(this), null, "message", "chat")
 
     this.connection.connect(jid, password, (status) => {
       if (status === Strophe.Status.CONNECTED) {
         this.jid = jid
-        this.sendPresence(this.status, this.statusMessage)
-        onConnect()
+        this.connection.send(this.status === "offline"? $pres({ type: "unavailable" }): $pres().c("show").t(this.status).up().c("status").t(this.statusMessage).tree())
+        connect()
       } else if (status === Strophe.Status.AUTHFAIL) {
         console.error("Authentication failed")
       }
     })
   }
 
-  sendPresence(show, statusMessage) {
-    const presence = show === "offline"
-      ? $pres({ type: "unavailable" })
-      : $pres().c("show").t(show).up().c("status").t(statusMessage)
-
-    this.connection.send(presence.tree())
-    console.log(`Status updated to: ${show}, message: ${statusMessage}`)
-
+  updateStatus(show, statusMessage) {
+    this.connection.send(show === "offline"? $pres({ type: "unavailable" }): $pres().c("show").t(show).up().c("status").t(statusMessage).tree())
     this.status = show
     this.statusMessage = statusMessage
-  }
-
-  updateStatus(show, statusMessage) {
-    this.sendPresence(show, statusMessage)
   }
 
   sendMessage(jid, msg) {
@@ -196,7 +186,7 @@ export class xmppService {
   }
 
   logOut() {
-    this.sendPresence("offline", "Disconnected")
+    this.connection.send($pres({ type: "unavailable" }))
     this.connection.disconnect()
     this.cleanClientValues()
   }
