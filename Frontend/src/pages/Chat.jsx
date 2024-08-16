@@ -62,6 +62,7 @@ const Chat = () => {
   const [isFormVisible, setIsFormVisible] = useState(false)
   const [currentChat, setCurrentChat] = useState(null)
   const [contacts, setContacts] = useState(JSON.parse(localStorage.getItem("contacts") || "[]"))
+  const [friendRequests, setFriendRequests] = useState(JSON.parse(localStorage.getItem("requests"))||"[]")
 
   const addContact = async (event) => {
     event.preventDefault();
@@ -107,7 +108,10 @@ const Chat = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column'}}>
-      <Header contacts={contacts} setContacts={(contacts)=>{setContacts(contacts)}}/>
+      <Header 
+      contacts={contacts} setContacts={(contacts)=>{setContacts(contacts)}}
+      friendRequests={friendRequests} setFriendRequests={(requests)=>{setContacts(requests)}}
+      />
       <ContactBar setContact={(contact) => {
         setCurrentChat(contact)
       }} 

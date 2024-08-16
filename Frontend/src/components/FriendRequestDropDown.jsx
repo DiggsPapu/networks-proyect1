@@ -58,36 +58,14 @@ const DropdownItem = styled.li`
 `;
 
 export default function FriendRequestDropDown({setContacts, contacts}) {
-    const [friendList, setFriendList] = useState(JSON.parse(localStorage.getItem("requests") || "[]"))
-    const filterFriendList = () => {        
-        let filteredFriends = []
-        if (contacts.length>0){
-            contacts.map((contact)=>{
-                if (!friendList.includes(contact.jid)){
-                    filteredFriends.push(contact.jid)
-                }
-                else{
-                    console.log(contact.jid)
-                }
-            })
-        }
-        else{
-            filteredFriends = friendList
-        }
-        setFriendList(filteredFriends)
-    }
-    // Filter friend list
-    useEffect(() => {
-        filterFriendList()
-    },[]);
-
+    const [friendList, setFriendList] = useState(JSON.parse(localStorage.getItem("requests") || "[]"));
     const [open, setOpen] = useState(false)
 
     const friendRequestAccepted = async (friendRequest) => {
         await acceptFriendRequest(friendRequest)
         setFriendList(friendList.filter((name) => name !== friendRequest))
-        await getContacts(JSON.parse(localStorage.getItem("contacts") || "[]"))
-        setContacts()
+        // await getContacts(JSON.parse(localStorage.getItem("contacts") || "[]"))
+        // setContacts()
     };
 
     const friendRequestRejected = async (friendRequest) => {

@@ -3,7 +3,7 @@ import FriendRequestDropDown from '../components/FriendRequestDropDown'
 import { useNavigate } from 'react-router-dom'
 import { addContact, deleteAccount, getContacts, logout } from '../services/services'
 
-export default function Header({contacts, setContacts}){
+export default function Header({contacts, setContacts, friendRequests, setFriendRequests}){
     const navigate = useNavigate();
     const [toggleChat, setToggleChat] = useState(false);
     const [isFormVisible, setIsFormVisible] = useState(false);

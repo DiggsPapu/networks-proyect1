@@ -63,13 +63,7 @@ export async function login(username, password) {
             );
             xmpp.on("stanza", async (stanza) => {
                 console.log(stanza)
-                if (stanza.is('presence') && stanza.attrs.type === 'subscribe') {
-                    console.log("subscribe: ");
-                    const from = stanza.attrs.from;
-                    console.log(from);
-                    friendrequest.push(from);
-                    localStorage.setItem("requests", JSON.stringify(friendrequest))
-                } else if (stanza.is('message') && stanza.getChild('body')) {
+                if (stanza.is('message') && stanza.getChild('body')) {
                     // Group chat
                     if (stanza.attrs.type === "groupchat") {
                         const from = stanza.attrs.from;
@@ -96,13 +90,28 @@ export async function login(username, password) {
                     const query = stanza.getChild('query');
                     if (query) {
                         query.getChildren("item").forEach((item) => {
+                            
                             const jid = item.attrs.jid;
                             const name = item.attrs.name || jid.split("@")[0];
                             const subscription = item.attrs.subscription;
-        
-                            contacts[jid] = { name, jid, presence: "offline", subscription: subscription || "none" };
-                            contacts_.push({ name, jid, presence: "offline", subscription: subscription || "none" });
+                            console.log(`name: ${name} subscription: ${subscription}`)
+                            if (subscription === "from"){
+                                console.log("from")
+                                friendrequest.push(jid);
+                                localStorage.setItem("requests", JSON.stringify(friendrequest))
+                            } else if (subscription === "to"){
+                                console.log("to")
+                                // Indicates that you have subscribed to this contact's presence, but they haven't subscribed to yours. contact
+                                contacts_.push({ name, jid, presence: "offline", subscription: subscription || "none" });
+                                contacts[jid] = { name, jid, presence: "offline", subscription: subscription || "none" };
+                            } else if (subscription === "both"){
+                                console.log("both")
+                                // Mutual subscription (not shown in this snippet, but would indicate both parties can see each other's presence). contact
+                                contacts_.push({ name, jid, presence: "offline", subscription: subscription || "none" });
+                                contacts[jid] = { name, jid, presence: "offline", subscription: subscription || "none" };
+                            }
                             localStorage.setItem("contacts", JSON.stringify(contacts_));
+                            localStorage.setItem("requests", JSON.stringify(friendrequest));
                             waitingForPresences.add(jid);
                         });
                     }
@@ -209,7 +218,7 @@ export async function getContacts() {
                     const jid = item.attrs.jid;
                     const name = item.attrs.name || jid.split("@")[0];
                     const subscription = item.attrs.subscription;
-
+                    console.log(`contact: ${jid}    subscription: ${subscription}`)
                     contacts[jid] = { name, jid, presence: "offline", subscription: subscription || "none" };
                     waitingForPresences.add(jid);
                 });
@@ -241,7 +250,10 @@ export async function getContacts() {
 }
 export async function addContact(contact) {
     if (xmpp){
-        await xmpp.send(xml('presence', { to: `${contact}@${domain}`, type: 'subscribe' }));
+        xmpp.on('online', () => {
+            xmpp.send(xml('presence', { to: `${contact}@${domain}`, type: 'subscribe' }));
+          })
+        
         console.log(`Request sent to ${contact}.`)
         return 201;
     }
@@ -249,13 +261,29 @@ export async function addContact(contact) {
     return 401;
 }
 export async function acceptFriendRequest(contact) {
-    const presenceStanza = xml(
-        'presence',
-        { to: contact, type: 'subscribed' }
-    );
-    xmpp.send(presenceStanza);
-    console.log(`Friend request from ${contact.split('@')[0]} accepted`)
-    return 200;
+    if (xmpp){
+        // Subscribe to the user's presence
+        const subscribe = xml('presence', {
+            to: contact,
+            type: 'subscribe'
+        });
+
+        // Optionally, send a "subscribed" presence to finalize the mutual subscription
+        const subscribed = xml('presence', {
+            to: contact,
+            type: 'subscribed'
+        });
+        console.log("contact:",contact)
+        await xmpp.send(subscribe);
+        await xmpp.send(subscribed);
+        console.log(`Friend request from ${contact.split('@')[0]} accepted`);
+        contacts_.push({ name: contact.split('@')[0], contact: contact, presence: "offline", subscription: "none" });
+        getContactDetails(contact.split('@')[0])
+        localStorage.setItem("contacts", JSON.stringify(contacts_));
+        return 200;
+    }
+    console.error("UNAUTHORIZED, must be logged in")
+    return 401;
 }
 export async function getContactDetails(contactName){
     let response = await getContacts();
