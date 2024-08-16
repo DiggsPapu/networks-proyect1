@@ -6,6 +6,7 @@ import Login from './pages/login.jsx'
 import SignUp from './pages/SignUp.jsx'
 import Chat from './pages/Chat.jsx'
 import { XMPPProvider } from './context/xmppContext.jsx'
+import Profile from './pages/Profile.jsx'
 const router = createBrowserRouter([
   {
     path: "/chat",
@@ -19,6 +20,10 @@ const router = createBrowserRouter([
     path: "/signUp",
     element: (<SignUp/>),
   },
+  {
+    path: "/profile",
+    element: (<Profile/>),
+  }
 ]);
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

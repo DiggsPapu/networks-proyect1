@@ -42,11 +42,11 @@ export default function SignUp() {
     let username = data.get('username')
     let password = data.get('password')
     client.signUp(username, password, () => {
-      setSuccess(true);
+      setSuccess(true)
     })
   }
   if (success) {
-    navigate('/login');
+    navigate('/login')
   }
 
   return (

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import FriendRequestDropDown from '../components/FriendRequestDropDown'
 import { useNavigate } from 'react-router-dom'
 import { useClient } from "../context/xmppContext"
@@ -12,9 +12,6 @@ export default function Header({contacts, setContacts}){
     if (loggedOut) {
         navigate('/login')
     }
-    useEffect(()=>{
-        
-    })
     const add_contact = async (event) => {
         event.preventDefault()
         const form = event.currentTarget
@@ -59,6 +56,7 @@ export default function Header({contacts, setContacts}){
             <button style={{position:'fixed', top:'0', left:'0'}}>{localStorage.getItem("username")}</button>
             <button type='button' onClick={logout_}>Log out</button>
             <button type='button' onClick={delete_account}>Delete Account</button>
+            <button type='button' onClick={()=>{navigate("/profile")}}>Change Profile</button>
             <>
                 <button onClick={toggleFormVisibility}>
                 AddContact

@@ -83,10 +83,6 @@ export default function ChatInstance({ contact, type = "user" }) {
     useEffect(() => {
         updateMessages()
         client.setOnMessageReceived(updateMessages)
-
-        return () => {
-            client.setOnMessageReceived(() => {});
-        };
     }, [client]);
 
     return (
