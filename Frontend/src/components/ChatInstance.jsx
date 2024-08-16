@@ -50,40 +50,42 @@ export const ChatBody = styled.div`
 `;
 
 export default function ChatInstance({ contact, type = "user" }) {
-    const [messages, setMessages] = useState([]);
-    const [toggleChat, setToggleChat] = useState(false);
+    const [messages, setMessages] = useState([])
+    const [toggleChat, setToggleChat] = useState(false)
     const client = useClient();
 
     const onSubmitMessage = async (msg) => {
-        updateMessages()
         client.setOnMessageReceived(updateMessages)
         client.sendMessage(contact.jid, msg)
-        setMessages(prevMessages => [...prevMessages, { userId: 1, message: msg }])
+        setMessages(prevMessages => {
+            let newMessages = [...prevMessages, { userId: 1, from:client.jid, to:contact.jid, message: msg, time: Date.now()}]
+            return newMessages.filter((message)=>(message.from===contact.jid)||(message.from === client.jid && message.to === contact.jid))
+        })
     }
 
-    const updateMessages = () => {
-        const newMessages = client.messagesReceived
-            .filter(message => message.from === contact.jid && !message.alreadyDisplayed)
-            .map(message => {
-                message.alreadyDisplayed = true;
-                return { userId: 0, message: message.body }
+    // const updateMessages = (to, from, message, timestamp) => {
+    //     if (from === contact.jid && messages.filter((message)=>message.timestamp==timestamp && message.from === from).length===0){
+    //         setMessages(prevMessages => [...prevMessages, {userId:0, from: from, to:client.jid, message: message, time: timestamp}])
+    //     }
+    //     console.log(messages)
+    //     // setMessages(messages.filter((message)=>{(message.from === client.jid && message.to === contact.jid) || (message.from === contact.jid && message.to === client.jid)}))
+    //     // console.log(messages.filter((message)=>{console.log(`to: ${message.to} from: ${message.from} message: ${message.message}`)}))
+    // }
+    const updateMessages = (to, from, message, timestamp) => {
+        if (from === contact.jid && messages.filter((message)=>message.timestamp==timestamp && message.from === from).length===0) {
+            setMessages(prevMessages => {
+                const newMessages = [...prevMessages, { userId: 0, from: from, to: client.jid, message: message, time: timestamp }];
+                return newMessages.filter((message)=>(message.from===contact.jid)||(message.from === client.jid && message.to === contact.jid))
             })
-        if (newMessages.length > 0) {
-            setMessages(prevMessages => [...prevMessages, ...newMessages])
         }
     }
-
+    
     const handleToggle = () => {
         setToggleChat(!toggleChat)
     }
-    useEffect(()=>{
-        client.contactCurrentlyChatting = contact.jid
-        setMessages([])
-    }, [contact])
     useEffect(() => {
-        updateMessages()
         client.setOnMessageReceived(updateMessages)
-    }, [client]);
+      }, [client])
 
     return (
         <ChatContainer toggle={toggleChat}>

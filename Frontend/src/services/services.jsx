@@ -53,26 +53,52 @@ export class xmppService {
   }
 
   handleMessage(message) {
-    console.log("Message stanza received:", message);
-    
     const from = message.getAttribute("from");
-    const body = message.getElementsByTagName("body")[0]?.textContent;
+    const to = message.getAttribute("to");
+    const forwarded = message.getElementsByTagName("forwarded")[0];
+    const fileElement = message.getElementsByTagName("file")[0];
+    const fileNameElement = message.getElementsByTagName("filename")[0];
+
+    let body;
+    let originalFrom;
+    let originalTo;
+    let timestamp;
+  
+    if (forwarded) {
+      const forwardedMessage = forwarded.getElementsByTagName("message")[0];
+      originalFrom = forwardedMessage.getAttribute("from");
+      originalTo = forwardedMessage.getAttribute("to");
+      body = forwardedMessage.getElementsByTagName("body")[0]?.textContent;
+  
+      const delay = forwarded.getElementsByTagName("delay")[0];
+      if (delay) {
+        timestamp = new Date(delay.getAttribute("stamp"));
+      }
+
+    } else {
+      originalFrom = from;
+      originalTo = to;
+      body = message.getElementsByTagName("body")[0]?.textContent;
+  
+      timestamp = new Date();
+    }
+
+    if (fileElement && fileNameElement) {
+      const base64Data = fileElement.textContent;
+      const fileName = fileNameElement.textContent;
+      const fileUrl = `data:application/octet-stream;base64,${base64Data}`;
+      
+      this.onFileReceived(originalTo, Strophe.getBareJidFromJid(originalFrom), fileName, fileUrl, timestamp);
+      return true;
+    }
   
     if (body) {
-      this.onMessageReceived({ from, body });
-      
-      const contactJid = `${from.split("@")[0]}@alumchat.lol`;
-      this.messagesReceived.push({
-        from: contactJid,
-        body,
-        messageId: this.messagesReceived.length.toString(),
-        alreadyDisplayed: false,
-      })
-      console.log(this.messagesReceived)
+      console.log(`Message received from ${Strophe.getBareJidFromJid(originalFrom)} at ${timestamp.toLocaleDateString()}: ${body}`);
+      this.onMessageReceived(originalTo, Strophe.getBareJidFromJid(originalFrom), body, timestamp); 
     }
-    return true;
-  }
   
+    return true;
+  }  
 
   setOnMessageReceived(callback) {
     this.onMessageReceived = callback
