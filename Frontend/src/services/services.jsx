@@ -18,6 +18,8 @@ export class xmppService {
     this.jid = "" 
     this.status = "online"
     this.statusMessage = "Available"
+    this.messagesReceived = []
+    this.contactCurrentlyChatting = ""
     this.onRosterReceived = () => {}
     this.onSubscriptionReceived = () => {} 
     this.onMessageReceived = () => {}
@@ -57,17 +59,30 @@ export class xmppService {
   sendMessage(jid, msg) {
     const message = $msg({ to: jid, type: "chat" }).c("body").t(msg)
     this.connection.send(message.tree())
+    console.log(this.contactCurrentlyChatting)
   }
 
   handleMessage(message) {
-    console.log("Message stanza received:", message)
-    const from = message.getAttribute("from")
-    const body = message.getElementsByTagName("body")[0]?.textContent
+    console.log("Message stanza received:", message);
+    
+    const from = message.getAttribute("from");
+    const body = message.getElementsByTagName("body")[0]?.textContent;
+  
     if (body) {
-      this.onMessageReceived({ from, body })
+      this.onMessageReceived({ from, body });
+      
+      const contactJid = `${from.split("@")[0]}@alumchat.lol`;
+      this.messagesReceived.push({
+        from: contactJid,
+        body,
+        messageId: this.messagesReceived.length.toString(),
+        alreadyDisplayed: false,
+      })
+      console.log(this.messagesReceived)
     }
-    return true
+    return true;
   }
+  
 
   setOnMessageReceived(callback) {
     this.onMessageReceived = callback

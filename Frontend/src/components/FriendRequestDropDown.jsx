@@ -58,32 +58,22 @@ const DropdownItem = styled.li`
     }
 `;
 
-export default function FriendRequestDropDown({contacts, setContacts}) {
+export default function FriendRequestDropDown({setContacts, contacts}) {
+    const [friendList, setFriendList] = useState(JSON.parse(localStorage.getItem("requests") || "[]"));
     const [open, setOpen] = useState(false)
     const client = useClient()
-    const [requests, setRequests] = useState([])
-
-    useEffect(() => {
-        client.fetchSubscriptionRequests(setRequests)
-        client.setOnSubscriptionReceived(setRequests)
-    }, [client])
 
     const friendRequestAccepted = async (friendRequest) => {
-        client.acceptSubscription(friendRequest)
-        setRequests(requests.filter((contact)=>contact!==friendRequest))
-        setContacts(() => ({
-            ...contacts,
-            [friendRequest]: {
-                jid: friendRequest,
-                status: "online", // or any default status you want to set
-                statusMessage: "Available" // or any default status message
-            }
-        }))
-    }
+        // await acceptFriendRequest(friendRequest)
+        // setFriendList(friendList.filter((name) => name !== friendRequest))
+        // await getContacts(JSON.parse(localStorage.getItem("contacts") || "[]"))
+        // setContacts()
+    };
 
     const friendRequestRejected = async (friendRequest) => {
-        client.rejectSubscription(friendRequest)
-        setRequests(requests.filter((contact)=>contact!==friendRequest))
+        // Handle the rejection logic here (if any)
+        // setFriendList(friendList.filter((name) => name !== friendRequest))
+        // await get_contacts()
     }
 
     return (
@@ -92,8 +82,8 @@ export default function FriendRequestDropDown({contacts, setContacts}) {
                 Friend Requests
             </button>
             <DropdownContent open={open}>
-                {requests.length > 0 ? (
-                    requests.map((friendRequest, index) => (
+                {friendList.length > 0 ? (
+                    friendList.map((friendRequest, index) => (
                         <DropdownItem key={index} id={friendRequest}>
                             {friendRequest}
                             <div>
