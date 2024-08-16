@@ -28,12 +28,8 @@ export default function Header({contacts, setContacts}){
     }
 
     const delete_account = async () => {
-        // const success = await borrarCuenta();
-        // if (success) {
-        // localStorage.clear();
-        // navigate('/login');
-        // }
-    };
+        client.borrarCuenta(()=>{navigate('/login')})
+    }
 
     const toggleFormVisibility = () => {
         setIsFormVisible(!isFormVisible);
@@ -59,7 +55,7 @@ export default function Header({contacts, setContacts}){
             <button type='button' onClick={()=>{navigate("/profile")}}>Change Profile</button>
             <>
                 <button onClick={toggleFormVisibility}>
-                aniadirContacto
+                Add Contact
                 </button>
                 {isFormVisible && (
                 <form onSubmit={add_contact}>

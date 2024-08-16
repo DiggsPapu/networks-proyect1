@@ -97,24 +97,14 @@ export class xmppService {
   signUp(username, password, onSuccess, onError) {
     this.connection.connect("alo20172@alumchat.lol", "Manager123", (status) => {
       if (status === Strophe.Status.CONNECTED) {
-        console.log("Connected to XMPP server")
-
-        const registerIQ = $iq({ type: "set", to: this.domain })
-          .c("query", { xmlns: "jabber:iq:register" })
-          .c("username").t(username).up()
-          .c("password").t(password).up()
-
-        this.connection.sendIQ(registerIQ, (iq) => {
-          console.log("Registration successful", iq)
+        this.connection.sendIQ($iq({ type: "set", to: this.domain }).c("query", { xmlns: "jabber:iq:register" }).c("username").t(username).up().c("password").t(password).up(), (iq) => {
           this.connection.disconnect()
           onSuccess()
         }, (error) => {
-          console.error("Registration failed", error)
           this.connection.disconnect()
           onError(error)
         })
       } else if (status === Strophe.Status.CONNFAIL) {
-        console.error("Connection to XMPP server failed")
         onError(new Error("Failed to connect to XMPP server"))
       }
     })
@@ -227,18 +217,9 @@ export class xmppService {
       }
     })
   }
-
+  
   borrarCuenta(onSuccess) {
-    const deleteIQ = $iq({ type: "set", to: this.domain })
-      .c("query", { xmlns: "jabber:iq:register" })
-      .c("remove")
-
-    this.connection.sendIQ(deleteIQ, (iq) => {
-      console.log("Account deletion successful", iq)
-      onSuccess()
-    }, (error) => {
-      console.error("Account deletion failed", error)
-    })
+    this.connection.sendIQ($iq({ type: "set", to: this.domain }).c("query", { xmlns: "jabber:iq:register" }).c("remove"), (iq) => {onSuccess()}, (error) => {})
   }
 
   sendSubscriptionRequest(jid) {
