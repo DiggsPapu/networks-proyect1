@@ -33,7 +33,7 @@ export default function Profile(){
                 onChange={(e) => setStatusMessage(e.target.value)}
             />
             <button>
-                Cambiar
+                Change
             </button>
         </form>
         </>

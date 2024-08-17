@@ -11,12 +11,14 @@ export default function ContactBar({setContact, contacts}) {
             top: '60px',
             left: '0',
         }}>
-            <label>Mensajear a alguien en especifico ingresa el jid</label>
+            <label>To message someone that is not in your roaster enter the username@alumchat.lol:</label>
             <input onChange={(e)=>setContactoEspecifico(e.target.value)}></input>
+            <br/>
             <button onClick={()=>{
                 setContact({jid:contactoEspecifico, status:"Desconocido no es de tu roaster", statusMessage:"Desconocido no es de tu roaster"})}
-                }>ingresar</button>
+                }>enter</button>
             <ul>
+                Roaster<br/>
             {Object.keys(contacts).length === 0 ? (
                 <p>No contacts added</p>
             ) : (

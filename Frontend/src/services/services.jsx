@@ -1,58 +1,69 @@
 import { Strophe, $pres, $msg, $iq } from "strophe.js"
 
+// This is a service to use a client context in the whole application
 export class xmppService {
-  static PRESENCE_TYPES = {
-    SUBSCRIBE: "subscribe",
-    SUBSCRIBED: "subscribed",
-    UNSUBSCRIBE: "unsubscribe",
-    UNSUBSCRIBED: "unsubscribed",
-    UNAVAILABLE: "unavailable",
-  }
-
+  // All the types that could be in the presence stanza
+  static PRESENCE_TYPES = {SUBSCRIBE: "subscribe",SUBSCRIBED: "subscribed",UNSUBSCRIBE: "unsubscribe",UNSUBSCRIBED: "unsubscribed",UNAVAILABLE: "unavailable"}
+  // A constructor to create a connection in the xmpp server
   constructor(url) {
+    // Creates an strophe connection
     this.connection = new Strophe.Connection(url)
-
+    // Sets a default domain
     this.domain = "alumchat.lol"
+    // To set the roster
     this.roster = {} 
+    // To get the subscriptions
     this.subscriptionQueue = []
+    // To set the jid
     this.jid = "" 
+    // To set a default status online bc it is created in the loggin page
     this.status = "online"
+    // To set a default message when connected (Available)
     this.statusMessage = "Available"
+    // To set empty messages because at first idk the messages until the listeners listens the messages
     this.messagesReceived = []
-    this.contactCurrentlyChatting = ""
-    this.rosterRecibido = () => {}
-    this.subscripcionRecibida = () => {} 
+    // this is a function to set the received messages
     this.onMessageReceived = () => {}
+    // This is a function to set the received subscription
+    this.subscripcionRecibida = () => {} 
+    // This is a function to set the received roaster
+    this.rosterRecibido = () => {}
   }
-
+  // The function to connect to the server it requires the params of the jid [username]@alumchat.lol && the password of the user
   connect(jid, password, connect) {
+    // This is to create a listener to listen all possible presences if the users of the roaster change the status or status message, the function is the function trigger when it gets a new presence
     this.connection.addHandler(this.handlePresence.bind(this), null, "presence")
-    this.connection.addHandler(this.handleMessage.bind(this), null, "message", "chat")
-
+    // This is the listener to listen to al the messages that are send to the user, the function is the function trigger when it gets a new message
+    this.connection.addHandler(this.obtuvoMensaje.bind(this), null, "message", "chat")
+    // This is to connect using strophe and connect making a default send status via xmpp and using a xml builder by Strophe
     this.connection.connect(jid, password, (status) => {
       if (status === Strophe.Status.CONNECTED) {
         this.jid = jid
-        this.connection.send(this.status === "offline"? $pres({ type: "unavailable" }): $pres().c("show").t(this.status).up().c("status").t(this.statusMessage).tree())
+        this.connection.send($pres().c("show").t(this.status).up().c("status").t(this.statusMessage).tree())
         connect()
       } else if (status === Strophe.Status.AUTHFAIL) {
         console.error("Authentication failed")
       }
     })
   }
-
-  actualizarEstado(show, statusMessage) {
-    this.connection.send(show === "offline"? $pres({ type: "unavailable" }): $pres().c("show").t(show).up().c("status").t(statusMessage).tree())
-    this.status = show
-    this.statusMessage = statusMessage
+  // To update the status, it gets the new status and the new message status
+  actualizarEstado(nuevoEstado, nuevoMensajeDeEstado) {
+    // Constructed to send the xmpp using all, in case it's offline it will trigger a type of unavailable bc it's offline, in any other case it will set the other status and status message
+    this.connection.send(nuevoEstado === "offline"? $pres({ type: "unavailable" }): $pres().c("show").t(nuevoEstado).up().c("status").t(nuevoMensajeDeEstado).tree())
+    // This is a handler of the new Status
+    this.status = nuevoEstado
+    // This is a handler of a new status message
+    this.statusMessage = nuevoMensajeDeEstado
   }
-
+  // Send message, in this case it takes the [username]@alumchat.lol of the person you want to send the message and the message that you want to send
   enviarMensaje(jid, msg) {
-    const message = $msg({ to: jid, type: "chat" }).c("body").t(msg)
-    this.connection.send(message.tree())
-    console.log(this.contactCurrentlyChatting)
+    // It sends the xmpp via strophe and constructs it
+    this.connection.send($msg({ to: jid, type: "chat" }).c("body").t(msg).tree())
   }
 
-  handleMessage(message) {
+  // This is in case it receives a message in the listener
+  obtuvoMensaje(message) {
+    // this is to set variables to store the messages and handle them
     let body, originalFrom, originalTo, timestamp
     const from = message.getAttribute("from")
     const to = message.getAttribute("to")
@@ -89,12 +100,13 @@ export class xmppService {
     }
     return true
   }  
-
+  // This is to use a useState in the application, so sending a callBackFunction and then using it
   setMensajeRecibido(callback) {
     this.onMessageReceived = callback
   }
-
+  // this is the function to sign up, just needs the username, the password, a function in case it successfully signs in and in case it is not successfull (it's not necessary to pass this)
   signUp(username, password, onSuccess, onError) {
+    // It's necessary to use an already created account to create any other accounts, probably a mistake in the server or something
     this.connection.connect("alo20172@alumchat.lol", "Manager123", (status) => {
       if (status === Strophe.Status.CONNECTED) {
         this.connection.sendIQ($iq({ type: "set", to: this.domain }).c("query", { xmlns: "jabber:iq:register" }).c("username").t(username).up().c("password").t(password).up(), (iq) => {
@@ -184,7 +196,6 @@ export class xmppService {
   salir() {
     this.connection.send($pres({ type: "unavailable" }))
     this.connection.disconnect()
-    this.cleanClientValues()
   }
 
   setrosterRecibido(callback) {
@@ -221,7 +232,6 @@ export class xmppService {
     this.connection.send(acceptPresence.tree())
 
     if (!(from in this.roster)) {
-      console.log("Adding contact to roster")
       this.enviarSubscripcion(from)
     }
 
@@ -230,7 +240,6 @@ export class xmppService {
   }
 
   rechazarSubscripcion(from) {
-    console.log(`Rejecting subscription request from ${from}`)
     const rejectPresence = $pres({ to: from, type: "unsubscribed" })
     this.connection.send(rejectPresence.tree())
     
