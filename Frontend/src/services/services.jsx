@@ -180,16 +180,6 @@ export class xmppService {
     const probe = $pres({ type: "probe", to: jid })
     this.connection.send(probe.tree())
   }
-  
-  cleanClientValues() {
-    this.roster = {}
-    this.subscriptionQueue = []
-    this.rosterRecibido = () => {}
-    this.subscripcionRecibida = () => {}
-    this.jid = ""
-    this.status = "online"
-    this.statusMessage = "Available"
-  }
 
   salir() {
     this.connection.send($pres({ type: "unavailable" }))
@@ -205,33 +195,18 @@ export class xmppService {
     this.subscripcionRecibida = callback
   }
 
-  getProfile(jid, onProfileReceived) {
-    const vCardIQ = $iq({ type: "get", to: jid }).c("vCard", { xmlns: "vcard-temp" })
-    this.connection.sendIQ(vCardIQ, (iq) => {
-      const vCard = iq.getElementsByTagName("vCard")[0]
-      if (vCard) {
-        console.log(iq)
-        // process vCard here
-      } else {
-        console.log("vCard not found")
-      }
-    })
-  }
-  
   borrarCuenta(onSuccess) {
     this.connection.sendIQ($iq({ type: "set", to: this.domain }).c("query", { xmlns: "jabber:iq:register" }).c("remove"), (iq) => {onSuccess()}, (error) => {})
   }
 
-  sendSubscriptionRequest(jid) {
+  enviarSubscripcion(jid) {
     const presenceSubscribe = $pres({ to: jid, type: "subscribe" })
     this.connection.send(presenceSubscribe.tree())
     console.log(`Subscription request sent to ${jid}`)
   }
 
   aniadirContacto(contact) {
-    const aniadirContactoIQ = $iq({ type: "set" })
-      .c("query", { xmlns: "jabber:iq:roster" })
-      .c("item", { jid: contact })
+    const aniadirContactoIQ = $iq({ type: "set" }).c("query", { xmlns: "jabber:iq:roster" }).c("item", { jid: contact })
   
     this.connection.sendIQ(aniadirContactoIQ, (iq) => {
       console.log(`Contact ${contact} added successfully`, iq)
@@ -247,7 +222,7 @@ export class xmppService {
 
     if (!(from in this.roster)) {
       console.log("Adding contact to roster")
-      this.sendSubscriptionRequest(from)
+      this.enviarSubscripcion(from)
     }
 
     this.subscriptionQueue = this.subscriptionQueue.filter(jid => jid !== from)

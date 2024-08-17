@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState } from "react"
 
 export default function ContactBar({setContact, contacts}) {
-
+    const [contactoEspecifico, setContactoEspecifico] = useState('')
     return (
         <div style={{
             width: '30%',
@@ -11,6 +11,11 @@ export default function ContactBar({setContact, contacts}) {
             top: '60px',
             left: '0',
         }}>
+            <label>Mensajear a alguien en especifico ingresa el jid</label>
+            <input onChange={(e)=>setContactoEspecifico(e.target.value)}></input>
+            <button onClick={()=>{
+                setContact({jid:contactoEspecifico, status:"Desconocido no es de tu roaster", statusMessage:"Desconocido no es de tu roaster"})}
+                }>ingresar</button>
             <ul>
             {Object.keys(contacts).length === 0 ? (
                 <p>No contacts added</p>

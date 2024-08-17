@@ -18,7 +18,7 @@ export default function Header({contacts, setContacts}){
         const data = new FormData(form)
         let username = data.get('contactUsername')
         console.log(username)
-        client.sendSubscriptionRequest(`${username}@alumchat.lol`)
+        client.enviarSubscripcion(`${username}@alumchat.lol`)
         toggleFormVisibility()
     };
 
@@ -49,11 +49,12 @@ export default function Header({contacts, setContacts}){
             zIndex: '1000',
         }}>
             
-            <button style={{position:'fixed', top:'0', left:'0'}}>{localStorage.getItem("username")}</button>
+            <div style={{position:'fixed', top:'0', left:'0'}}>{client.jid}</div>
             <button type='button' onClick={salir_}>Log out</button>
             <button type='button' onClick={delete_account}>Delete Account</button>
             <button type='button' onClick={()=>{navigate("/profile")}}>Change Profile</button>
             <>
+                
                 <button onClick={toggleFormVisibility}>
                 Add Contact
                 </button>

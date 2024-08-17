@@ -59,21 +59,21 @@ const DropdownItem = styled.li`
 `;
 
 export default function FriendRequestDropDown({setContacts, contacts}) {
-    const [friendList, setFriendList] = useState(JSON.parse(localStorage.getItem("requests") || "[]"));
-    const [open, setOpen] = useState(false)
     const client = useClient()
+    const [friendList, setFriendList] = useState(client.subscriptionQueue)
+    const [open, setOpen] = useState(false)
+    
 
     const friendRequestAccepted = async (friendRequest) => {
-        // await acceptFriendRequest(friendRequest)
-        // setFriendList(friendList.filter((name) => name !== friendRequest))
-        // await getContacts(JSON.parse(localStorage.getItem("contacts") || "[]"))
-        // setContacts()
-    };
+        client.aceptarSubscripcion(friendRequest)
+        setFriendList(friendList.filter((name) => name !== friendRequest))
+        client.fetchRoster()
+    }
 
     const friendRequestRejected = async (friendRequest) => {
-        // Handle the rejection logic here (if any)
-        // setFriendList(friendList.filter((name) => name !== friendRequest))
-        // await get_contacts()
+        client.rechazarSubscripcion(friendRequest)
+        setFriendList(friendList.filter((name) => name !== friendRequest))
+        client.fetchRoster()
     }
 
     return (
