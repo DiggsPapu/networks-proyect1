@@ -32,7 +32,7 @@ export class xmppService {
   // The function to connect to the server it requires the params of the jid [username]@alumchat.lol && the password of the user
   connect(jid, password, connect) {
     // This is to create a listener to listen all possible presences if the users of the roaster change the status or status message, the function is the function trigger when it gets a new presence
-    this.connection.addHandler(this.handlePresence.bind(this), null, "presence")
+    this.connection.addHandler(this.obtuvoPresencia.bind(this), null, "presence")
     // This is the listener to listen to al the messages that are send to the user, the function is the function trigger when it gets a new message
     this.connection.addHandler(this.obtuvoMensaje.bind(this), null, "message", "chat")
     // This is to connect using strophe and connect making a default send status via xmpp and using a xml builder by Strophe
@@ -65,12 +65,18 @@ export class xmppService {
   obtuvoMensaje(message) {
     // this is to set variables to store the messages and handle them
     let body, originalFrom, originalTo, timestamp
+    // Get the 'from' attribute of the message (sender's JID)
     const from = message.getAttribute("from")
+    // Get the 'to' attribute of the message (recipient's JID)
     const to = message.getAttribute("to")
+    // Check if the message is forwarded (part of a message archive or history)
     const forwarded = message.getElementsByTagName("forwarded")[0]
+    // Check if the message contains a file (for file transfers)
     const fileElement = message.getElementsByTagName("file")[0]
+    // Check if the message contains a filename (for file transfers)
     const fileNameElement = message.getElementsByTagName("filename")[0]
     if (forwarded) {
+      // Handle forwarded messages (message archives)
       const forwardedMessage = forwarded.getElementsByTagName("message")[0]
       originalFrom = forwardedMessage.getAttribute("from")
       originalTo = forwardedMessage.getAttribute("to")
@@ -78,10 +84,11 @@ export class xmppService {
   
       const delay = forwarded.getElementsByTagName("delay")[0]
       if (delay) {
+        // Extract the timestamp from the forwarded message
         timestamp = new Date(delay.getAttribute("stamp"))
       }
-
     } else {
+      // Handle regular messages
       originalFrom = from
       originalTo = to
       body = message.getElementsByTagName("body")[0]?.textContent
@@ -89,12 +96,13 @@ export class xmppService {
     }
 
     if (fileElement && fileNameElement) {
+      // Handle received files (e.g., file transfers)
       this.onFileReceived(ot, Strophe.getBareJidFromJid(f), fileNameElement.textContent, `data:application/octet-streambase64,${fileElement.textContent}`, ts)
       return true
     }
   
-    if (body) {
-      console.log(`Message received from ${Strophe.getBareJidFromJid(originalFrom)} at ${timestamp.toLocaleDateString()}: ${body}`)
+    if (body) { 
+      // Log the received message and store it in the messagesReceived array
       this.messagesReceived.push({userId:0, from:Strophe.getBareJidFromJid(originalFrom), to:this.jid, message:body, time:timestamp })
       this.onMessageReceived(originalTo, Strophe.getBareJidFromJid(originalFrom), body, timestamp) 
     }
@@ -109,141 +117,149 @@ export class xmppService {
     // It's necessary to use an already created account to create any other accounts, probably a mistake in the server or something
     this.connection.connect("alo20172@alumchat.lol", "Manager123", (status) => {
       if (status === Strophe.Status.CONNECTED) {
-        this.connection.sendIQ($iq({ type: "set", to: this.domain }).c("query", { xmlns: "jabber:iq:register" }).c("username").t(username).up().c("password").t(password).up(), (iq) => {
+          // the sending query to sign up via using another client of default like alo20172@alumchat.lol to create other users, it handles the type via strophe.js
+          this.connection.sendIQ($iq({ type: "set", to: this.domain }).c("query", { xmlns: "jabber:iq:register" }).c("username").t(username).up().c("password").t(password).up(), (iq) => {
+          // Disconnects because the client it's just to create a new client and then not using it
           this.connection.disconnect()
+          // it's to use the function passed in the context in the react page
           onSuccess()
         }, (error) => {
+          // In case there is an error it just disconnects
           this.connection.disconnect()
           onError(error)
         })
+        // In case it can't connect the client to create other clients it sets a failed error
       } else if (status === Strophe.Status.CONNFAIL) {
         onError(new Error("Failed to connect to XMPP server"))
       }
     })
   }
-
+  // To get the roaster
   fetchRoster() {
-    const rosterIQ = $iq({ type: "get" }).c("query", { xmlns: "jabber:iq:roster" })
-
-    this.connection.sendIQ(rosterIQ, (iq) => {
-      console.log("Roster received", iq)
+    // To send the query to get the roaster in the xmpp protocol via strophe js.
+    this.connection.sendIQ($iq({ type: "get" }).c("query", { xmlns: "jabber:iq:roster" }), (iq) => {
+      // A contacts empty to push the contacts 1 by 1
       const contacts = {}
+      // Get the items of the iq and push and handle each of the contact
       const items = iq.getElementsByTagName("item")
       for (let i = 0; i < items.length; i++) {
+        // Get the jid
         const jid = items[i].getAttribute("jid")
+        // Get if the contact has the capability of getting my presence and all or if they are asking for a subscription (they want to know me)
         if (items[i].getAttribute("subscription") === "both" || items[i].getAttribute("ask") === "subscription" ) {
+          // set default contacts format
           contacts[jid] = this.roster[jid] || { jid, status: "offline", statusMessage: "" }
+          // Send a probe 
           this.connection.send($pres({ type: "probe", to: jid }))
         }
       }
+      // set the roster
       this.roster = contacts
       this.rosterRecibido({ ...this.roster })
     })
   }
-
-  handlePresence(presence) {
-    console.log("Presence stanza received:", presence)
-
+  // when getting a new presence it handles it and it receives the new presence
+  obtuvoPresencia(presence) {
+    // Get the 'from' attribute (JID of the sender)
     const fullJid = presence.getAttribute("from")
+    // Obtain the from from the JID sender
     const from = Strophe.getBareJidFromJid(fullJid)
+    // Get the type from the presence
     const type = presence.getAttribute("type")
-
+    // Check that is not the same
     if (this.jid !== from) {
+      // Depending on the type it will be the handling
       switch (type) {
+        // In case its a subscribe presence
         case xmppService.PRESENCE_TYPES.SUBSCRIBE:
           this.handleSubscriptionRequest(from)
           break
+          // In case it is already subscribed
         case xmppService.PRESENCE_TYPES.SUBSCRIBED:
-          console.log(`${from} accepted your subscription request`)
           break
+        // In case it is unsubscription request
         case xmppService.PRESENCE_TYPES.UNSUBSCRIBED:
           delete this.roster[from]
           break
+        // In case it is offline
         case xmppService.PRESENCE_TYPES.UNAVAILABLE:
           this.roster[from] = { jid: from, status: "offline", statusMessage: "" }
           break
         default:
+          // Default case 
           const status = presence.getElementsByTagName("show")[0]?.textContent || "online"
           const statusMessage = presence.getElementsByTagName("status")[0]?.textContent || "Available"
           this.roster[from] = { jid: from, status, statusMessage }
       }
       this.rosterRecibido({ ...this.roster })
     }
-
     return true
   }
-
+  // Handle the subscription request, it gets the from jid
   handleSubscriptionRequest(from) {
+    // Checking if the jid is in the roster it sets the subscription and it handles in the function
     if (!(from in this.roster)) {
-      console.log(`Subscription request from ${from} received`)
       this.subscriptionQueue.push(from)
       this.subscripcionRecibida([...this.subscriptionQueue])
     } else {
-      console.log(`Subscription request from ${from} already accepted`)
+      // In case, it just accepts the subscription
       this.aceptarSubscripcion(from)
     }
   }
-
+  // Getting the requests of the subscription
   fetchSubscriptionRequests(onFetchSubscriptions) {
     onFetchSubscriptions([...this.subscriptionQueue])
   }
-
+  // Sending a presence probe gets jid to set the probe
   sendPresenceProbe(jid) {
-    const probe = $pres({ type: "probe", to: jid })
-    this.connection.send(probe.tree())
+    this.connection.send($pres({ type: "probe", to: jid }).tree())
   }
-
+  // Handle to logout
   salir() {
+    // Sending stanza to loggot setting presence unavailable
     this.connection.send($pres({ type: "unavailable" }))
     this.connection.disconnect()
   }
-
+  // Callback handling where the roster it's received
   setrosterRecibido(callback) {
     this.rosterRecibido = callback
   }
-
+  // Callback handling where a change in subscription is received
   setsubscripcionRecibida(callback) {
     this.subscripcionRecibida = callback
   }
-
+  // Deleting the account just gets the function to do in the success when it's successfully deleted
   borrarCuenta(onSuccess) {
+    // Sending the stanza to delete account
     this.connection.sendIQ($iq({ type: "set", to: this.domain }).c("query", { xmlns: "jabber:iq:register" }).c("remove"), (iq) => {onSuccess()}, (error) => {})
   }
-
+  // Sending a subscription, it gets the jid to subscribe
   enviarSubscripcion(jid) {
-    const presenceSubscribe = $pres({ to: jid, type: "subscribe" })
-    this.connection.send(presenceSubscribe.tree())
-    console.log(`Subscription request sent to ${jid}`)
+    // Sending the subscription stanza to the jid
+    this.connection.send($pres({ to: jid, type: "subscribe" }).tree())
   }
-
+  // Add a contact
   aniadirContacto(contact) {
-    const aniadirContactoIQ = $iq({ type: "set" }).c("query", { xmlns: "jabber:iq:roster" }).c("item", { jid: contact })
-  
-    this.connection.sendIQ(aniadirContactoIQ, (iq) => {
-      console.log(`Contact ${contact} added successfully`, iq)
-    }, (error) => {
-      console.error(`Failed to add contact ${contact}`, error)
-    })
+    // Sending the add request to roster
+    this.connection.sendIQ($iq({ type: "set" }).c("query", { xmlns: "jabber:iq:roster" }).c("item", { jid: contact }), (iq) => {}, (error) => {})
   }
 
   aceptarSubscripcion(from) {
-    console.log(`Accepting subscription request from ${from}`)
-    const acceptPresence = $pres({ to: from, type: "subscribed" })
-    this.connection.send(acceptPresence.tree())
-
-    if (!(from in this.roster)) {
-      this.enviarSubscripcion(from)
-    }
-
+    // Accepting the subscription sending the stanza
+    this.connection.send($pres({ to: from, type: "subscribed" }).tree())
+    // sending subscription for each guy in the roster
+    if (!(from in this.roster)) {this.enviarSubscripcion(from)}
+    // Filtering accepted subscriptions
     this.subscriptionQueue = this.subscriptionQueue.filter(jid => jid !== from)
     this.subscripcionRecibida([...this.subscriptionQueue])
   }
-
+// Reject subscription, getting the jid
   rechazarSubscripcion(from) {
-    const rejectPresence = $pres({ to: from, type: "unsubscribed" })
-    this.connection.send(rejectPresence.tree())
-    
+    // Sending the xmpp to unsubscribe and reject the subscription
+    this.connection.send($pres({ to: from, type: "unsubscribed" }).tree())
+    // Filtering the subscriptions
     this.subscriptionQueue = this.subscriptionQueue.filter(jid => jid !== from)
+    // Handling the subscriptions and filtering the subscriptions from this
     this.subscripcionRecibida([...this.subscriptionQueue])
   }
 }
