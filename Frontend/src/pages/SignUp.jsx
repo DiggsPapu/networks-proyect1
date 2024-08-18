@@ -1,19 +1,19 @@
-import Avatar from '@mui/material/Avatar'
-import Button from '@mui/material/Button'
-import CssBaseline from '@mui/material/CssBaseline'
-import TextField from '@mui/material/TextField'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import Checkbox from '@mui/material/Checkbox'
-import Link from '@mui/material/Link'
-import Grid from '@mui/material/Grid'
-import Box from '@mui/material/Box'
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
-import Typography from '@mui/material/Typography'
-import Container from '@mui/material/Container'
-import { createTheme, ThemeProvider } from '@mui/material/styles'
-import { useNavigate } from "react-router-dom"
-import { useClient } from '../context/xmppContext'
-import React, { useState } from 'react'
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import CssBaseline from '@mui/material/CssBaseline';
+import TextField from '@mui/material/TextField';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
+import Link from '@mui/material/Link';
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import Typography from '@mui/material/Typography';
+import Container from '@mui/material/Container';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { useNavigate } from "react-router-dom";
+import { useClient } from '../context/xmppContext';
+import React, { useState } from 'react';
 
 function Copyright(props) {
   return (
@@ -25,28 +25,32 @@ function Copyright(props) {
       {new Date().getFullYear()}
       {'.'}
     </Typography>
-  )
+  );
 }
 
-// TODO remove, this demo shouldn't need to reset the theme.
+const defaultTheme = createTheme();
 
-const defaultTheme = createTheme()
 export default function SignUp() {
-  const navigate = useNavigate()
-  const client = useClient()
-  const [success, setSuccess] = useState(false)
+  const navigate = useNavigate(); // Hook for navigation
+  const client = useClient(); // Access the XMPP client context
+  const [success, setSuccess] = useState(false); // State to track if sign-up was successful
+
+  // Handle form submission
   const handleSubmit = async (event) => {
-    event.preventDefault()
-    const form = event.currentTarget
-    const data = new FormData(form)
-    let username = data.get('username')
-    let password = data.get('password')
+    event.preventDefault();
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    let username = data.get('username');
+    let password = data.get('password');
+
     client.signUp(username, password, () => {
-      setSuccess(true)
-    })
-  }
+      setSuccess(true);
+    });
+  };
+
+  // Redirect to login page if sign-up is successful
   if (success) {
-    navigate('/login')
+    navigate('/login');
   }
 
   return (
@@ -68,15 +72,17 @@ export default function SignUp() {
             Sign up
           </Typography>
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
-            <Grid item xs={12}>
-              <TextField
-                required
-                fullWidth
-                id="username"
-                label="Username"
-                name="username"
-                autoComplete="username"
-              />
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  id="username"
+                  label="Username"
+                  name="username"
+                  autoComplete="username"
+                />
+              </Grid>
               <Grid item xs={12}>
                 <TextField
                   required

@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import { FaLocationArrow } from 'react-icons/fa'
-import styled, {keyframes} from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 
+// Define a CSS snippet for when the footer is toggled (hidden)
 const heightToggled = `
     height: 0%; 
     padding: 0px;
@@ -9,12 +10,14 @@ const heightToggled = `
     display: none;
 `
 
+// Define a CSS snippet for when the footer is visible
 const height = `
     height: 20%; 
     padding: 10px;
     opacity: 1;
 `
 
+// Define a styled component for the footer
 export const StyledFooter = styled.div`
     position: relative;
     display: flex;
@@ -25,9 +28,7 @@ export const StyledFooter = styled.div`
 
     border-radius: 0px 0px 4px 4px;
     background-color: rgba(0,0,0,.03);
-
-	transition: all 1s ease;
-
+    transition: all 1s ease;
     input {
         width: 100%;
         background: none;
@@ -59,7 +60,7 @@ export const StyledFooter = styled.div`
         
         &:active {
             i {
-            color: purple;
+                color: purple;
             }
         }
         
@@ -69,6 +70,7 @@ export const StyledFooter = styled.div`
     }
 `;
 
+// Functional component to render the StyledFooter with its children
 const head = ({toggle, children}) => (
     <StyledFooter
         toggle={toggle}
@@ -77,25 +79,34 @@ const head = ({toggle, children}) => (
     </StyledFooter>
 )
 
+// Class component for the chat footer
 class ChatFooter extends Component {
-    constructor(props){
+    constructor(props) {
         super(props)
+        // Create a ref for the input field to directly manipulate DOM elements
         this.inputMessage = React.createRef()
     }
+
+    // Component state to manage the message input
     state = {
         message: ''
     }
 
+    // Update state when input field value changes
     handleOnChange = e => this.setState({ message: e.target.value })
 
+    // Handle key up event, specifically when Enter is pressed
     handleKeyUp = e => {
         const ENTER = 13
 
         if (e.keyCode === ENTER) {
-            this.props.onSubmitMessage(this.state.message);
+            // Call the onSubmitMessage prop function passed from the parent component
+            this.props.onSubmitMessage(this.state.message)
+            // Clear the input field after sending the message
             this.inputMessage.current.value = ""
         }
     }
+
     render() {
         return (
             <StyledFooter toggle={this.props.toggle}>
@@ -109,7 +120,7 @@ class ChatFooter extends Component {
                     <FaLocationArrow color="white" />
                 </button>
             </StyledFooter>
-        );
+        )
     }
 }
 

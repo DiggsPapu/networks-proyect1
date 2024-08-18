@@ -10,9 +10,9 @@ const DropdownContainer = styled.div`
     display: inline-block;
 `;
 
-
+// DropdownContent handles the visibility and layout of the dropdown menu
 const DropdownContent = styled.ul`
-    display: ${props => props.open ? 'block' : 'none'};
+    display: ${props => props.open ? 'block' : 'none'}; // Controls whether the dropdown is visible
     position: absolute;
     border-radius: 4px;
     width: 100%;
@@ -24,6 +24,7 @@ const DropdownContent = styled.ul`
     box-sizing: border-box;
 `;
 
+// DropdownItem defines the style for each item in the dropdown list
 const DropdownItem = styled.li`
     padding: 10px;
     border-bottom: 1px solid #ddd;
@@ -58,25 +59,28 @@ const DropdownItem = styled.li`
     }
 `;
 
-export default function FriendRequestDropDown({setContacts, contacts}) {
-    const client = useClient()
-    const [friendList, setFriendList] = useState(client.subscriptionQueue)
-    const [open, setOpen] = useState(false)
-    
+// FriendRequestDropDown functional component for handling friend requests
+export default function FriendRequestDropDown({ setContacts, contacts }) {
+    const client = useClient() // Get the XMPP client from the context
+    const [friendList, setFriendList] = useState(client.subscriptionQueue) // Initialize the friend request list from the client's subscription queue
+    const [open, setOpen] = useState(false) // State to handle dropdown visibility
 
+    // Function to handle accepting a friend request
     const friendRequestAccepted = async (friendRequest) => {
-        client.aceptarSubscripcion(friendRequest)
-        setFriendList(friendList.filter((name) => name !== friendRequest))
-        client.fetchRoster()
+        client.aceptarSubscripcion(friendRequest) // Call the client's method to accept the subscription
+        setFriendList(friendList.filter((name) => name !== friendRequest)) // Remove the accepted friend request from the list
+        client.fetchRoster() // Refresh the roster
     }
 
+    // Function to handle rejecting a friend request
     const friendRequestRejected = async (friendRequest) => {
-        client.rechazarSubscripcion(friendRequest)
-        setFriendList(friendList.filter((name) => name !== friendRequest))
-        client.fetchRoster()
+        client.rechazarSubscripcion(friendRequest) // Call the client's method to reject the subscription
+        setFriendList(friendList.filter((name) => name !== friendRequest)) // Remove the rejected friend request from the list
+        client.fetchRoster() // Refresh the roster
     }
 
     return (
+        // The return section remains unchanged, so it is not commented
         <DropdownContainer>
             <button onClick={() => setOpen(!open)}>
                 Friend Requests

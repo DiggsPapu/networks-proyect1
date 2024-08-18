@@ -15,24 +15,28 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useClient } from '../context/xmppContext';
 
+// Create a default Material-UI theme
 const defaultTheme = createTheme();
 
 export default function Login() {
-  const client = useClient();
-  const navigate = useNavigate();
-  const [success, setSuccess] = useState(false);
+  const client = useClient(); // Access the XMPP client context
+  const navigate = useNavigate(); // Hook to programmatically navigate to different routes
+  const [success, setSuccess] = useState(false); // State to manage login success
 
+  // Handle form submission
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
+    const data = new FormData(event.currentTarget); // Extract form data
     const username = data.get('username');
     const password = data.get('password');
 
+    // Attempt to connect using the XMPP client
     client.connect(username, password, () => {
-      setSuccess(true);
+      setSuccess(true); // Set success to true if connection is successful
     });
   };
 
+  // Redirect to the chat page if login is successful
   if (success) {
     navigate('/chat');
   }
@@ -40,7 +44,7 @@ export default function Login() {
   return (
     <ThemeProvider theme={defaultTheme}>
       <Container component="main" maxWidth="xs">
-        <CssBaseline />
+        <CssBaseline /> {/* Ensures consistent baseline styles */}
         <Box
           sx={{
             marginTop: 8,
@@ -50,11 +54,12 @@ export default function Login() {
           }}
         >
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-            <LockOutlinedIcon />
+            <LockOutlinedIcon /> {/* Icon for the avatar */}
           </Avatar>
           <Typography component="h1" variant="h5">
             Log in
           </Typography>
+          {/* Form for the login input fields */}
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
             <TextField
               margin="normal"

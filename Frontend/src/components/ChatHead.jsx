@@ -1,8 +1,8 @@
-
 import React from 'react';
 import { FaBars } from 'react-icons/fa';
 import styled from 'styled-components';
 
+// Define a styled component for the header section of the chat
 export const Head = styled.div`
     display: flex;
     align-items: center;
@@ -12,17 +12,13 @@ export const Head = styled.div`
     justify-content: space-between;
     border-radius: 4px 4px 0px 0px;
     background-color: rgba(0,0,0,.03);
-
     ${props => props.toggle ? 'height: 100%;' : 'height: 20%;'} 
-
     div:first-child {
         display: flex;
         align-items: center;
     }
-
     div:nth-child(2) {
         margin-right: 5px;
-
         svg:hover {
             cursor: pointer;
         }
@@ -36,12 +32,13 @@ export const Head = styled.div`
         display: flex;
         flex-direction: column;
     }
-    .coso span{
+    .coso span {
         font-size: 10px;
         color: lightgreen;
     }
 `;
 
+// Functional component to render the chat header
 const ChatHead = ({ name, toggle, onClick, presence, presenceMessage }) => (
     <Head toggle={toggle}>
         <div>
