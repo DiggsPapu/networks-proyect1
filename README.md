@@ -58,3 +58,9 @@ To chat you got 2 options, you can enter directly the [username]@alumchat.lol an
 As you can see there are some buttons with the [username]@alumchat.lol, status, and status message and all those buttons are from your roaster. So you just enter and you can start chatting, it will show you messages and you can send messages entering the message and then hitting enter.
 As you can see it will also show you the status and the status message
 ![alt text](image-11.png)
+
+## Difficulties
+During this proyect I encountered several problems, at first y tried to develop a Backend using express and nodejs, the issue with this is that it's unnecesary to do because it's a live chat app, not an application that awaits for a response like sending requests and fetching them. It needs listeners to be connected directly with the frontend, that's why at first aproach I did a docker compose because I was developing a backend but then I refactor all this to make an app to using contexts and listeners to handle the messages and all. Then another issue was to change @xmpp to Strophe.js because @xmpp was designed for backend so It didn't handle the listeners and all the stuff I wanted. Also Strophe is not that intuitive at first sight. 
+
+## Conclusions
+I didn't like this project, it's not my type to handle protocols and all these, even though it's okay to learn about all this things and have a multiple aproach to have a general learning.
